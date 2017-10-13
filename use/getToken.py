@@ -1,0 +1,75 @@
+import time
+import re
+from selenium import webdriver
+from scrapy import Selector
+
+
+def get_token():
+	"""
+	获取access_token
+	:return:
+	"""
+	browser = webdriver.PhantomJS(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
+	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
+	denglu = 'http://114.251.8.193/login.jsp'
+	browser.get(denglu)
+	browser.find_element_by_id('username').send_keys('yinguoshu')
+	browser.find_element_by_id('password1').send_keys('yinguoshu')
+	browser.find_element_by_id('submitButton').click()
+	browser.get('http://114.251.8.193/web/api/oauth/authorization.jsp')
+	time.sleep(0.5)
+	browser.maximize_window()
+	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	time.sleep(0.5)
+	browser.find_element_by_class_name('expandResource').click()
+	time.sleep(0.5)
+	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	time.sleep(0.5)
+	browser.find_element_by_name('client_id').send_keys('6050f8adac110002270d833aed28242d')
+	browser.find_element_by_name('redirect_uri').send_keys('http://www.baidu.com/')
+	browser.find_element_by_name('response_type').send_keys('code')
+	browser.find_element_by_name('scope').send_keys('read_cn')
+	browser.find_element_by_id('mysubmit').click()
+	time.sleep(0.5)
+
+	######
+	handles = browser.window_handles
+	browser.switch_to.window(handles[1])
+	#######
+
+	browser.find_element_by_name('j_username').send_keys('yinguoshu')
+	browser.find_element_by_name('j_password').send_keys('yinguoshu')
+	browser.find_element_by_class_name('bottong').click()
+	time.sleep(0.5)
+	browser.find_element_by_name('authorize').click()
+	time.sleep(0.5)
+	code = re.search(r'code\=(.*?)$', browser.current_url).groups()[0]
+	browser.close()
+	############
+	browser.switch_to.window(handles[0])
+	###########
+
+	browser.maximize_window()
+	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	time.sleep(0.5)
+	browser.find_element_by_id('resource_获取token').find_element_by_class_name('expandResource').click()
+	time.sleep(0.5)
+	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	time.sleep(0.5)
+	browser.find_element_by_id('resource_获取token').find_element_by_name('client_id').send_keys(
+		'6050f8adac110002270d833aed28242d')
+	browser.find_element_by_id('resource_获取token').find_element_by_name('code').send_keys(code)
+	browser.find_element_by_id('resource_获取token').find_element_by_name('client_secret').send_keys(
+		'6050f8adac110002270d833a4641d8cf')
+	browser.find_element_by_id('resource_获取token').find_element_by_name('grant_type').send_keys('authorization_code')
+	browser.find_element_by_id('resource_获取token').find_element_by_name('redirect_uri').send_keys(
+		'http://www.baidu.com/')
+	browser.find_element_by_id('resource_获取token').find_element_by_class_name('submit').click()
+	time.sleep(0.5)
+	select = Selector(text=browser.page_source)
+	tags = select.xpath('//pre[@class="json"]/code/span[@class="hljs-string"]/text()').extract()
+	access_token = tags[0].replace('"', '')
+	# refresh_token = tags[2].replace('"', '')
+	browser.quit()
+
+	return access_token
