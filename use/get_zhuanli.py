@@ -128,11 +128,12 @@ def main():
 		# page = info.get('page')
 		total = info.get('total')
 		records = info.get('context').get('records')
-		# 通过totle确定循环次数
+		# 通过total确定循环次数
+		# 加入9999次，pages=100页
 		pages = math.ceil(int(total) / 100)
 		if pages == 1:
 			# 直接入库  doing
-			in_zhuanli()
+			in_zhuanli(connect, 'zhuanli_info', )
 			continue
 		for p in range(2, pages + 1):
 			response = get_res('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab', proposer, 1)
@@ -145,6 +146,10 @@ def main():
 			records = info.get('context').get('records')
 	# 入库
 	pass
+
+
+def get_values(records):
+	values = [record.values() for record in records]
 
 
 if __name__ == '__main__':
