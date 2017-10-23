@@ -91,7 +91,8 @@ def in_comp(connect, vals):
 
 if __name__ == '__main__':
 	# val_all = read_xml('申请人名单大全1.xlsx')
-	val_all = read_xml_gen('name_all.xlsx')
+	val_all = read_xml_gen('hou30w.xlsx')
+	print(len(val_all))
 	# print(val_all)
 	# for a in val_all:
 	# 	print(a)

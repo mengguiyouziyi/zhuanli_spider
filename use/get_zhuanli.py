@@ -4,6 +4,7 @@ import traceback
 import pymysql
 import math
 import json
+from getToken import get_token
 
 
 def get_api(access_token):
@@ -15,10 +16,10 @@ def get_api(access_token):
 	#                           charset='utf8', cursorclass=pymysql.cursors.DictCursor)
 	# cursor = connect.cursor()
 	url = "http://114.251.8.193/api/patent/search/expression"
-	words = ['雪佛龙美国公司', '中兴通讯股份有限公司', '三星电子株式会社']
+	words = ['中兴通讯股份有限公司', '三星电子株式会社']
 
 	for j in words:
-		for i in range(math.ceil()):
+		for i in range(100):
 			querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 			               "access_token": access_token,
 			               # "access_token": "30e0b80a-9d22-4129-8607-46d749d97c53",
@@ -105,9 +106,28 @@ def get_res(access_token, proposer, page):
 	return response
 
 
+def parse_page(token, proposer, page):
+	response = get_res(token, proposer, page)
+	# 解析response，获得totle
+	info = json.loads(response.text)
+	errorCode = info.get('errorCode')
+	# 如果token过期了，递归调用自身
+	if not errorCode:
+		token = get_token()
+		parse_page(token, proposer, page)
+	# 如果没过期，但返回错误
+	if errorCode != "000000":
+		return None
+	# page = info.get('page')
+	total = info.get('total')
+	records = info.get('context').get('records')
+	values = [record.values() for record in records]
+	return (total, values)
+
+
 def main():
 	# 获取公司列表
-	config = {'host': 'etl1.innotree.org',
+	config = {'host': 'etl2.innotree.org',
 	          'port': 3308,
 	          'user': 'spider',
 	          'password': 'spider',
@@ -116,45 +136,32 @@ def main():
 	          'cursorclass': pymysql.cursors.DictCursor}
 	connect = pymysql.connect(**config)
 	results = get_comp(connect)
+	token = get_token()
 	# page=1，获取response
 	for result in results:
 		proposer = result.get('comp_full_name')
-		response = get_res('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab', proposer, 1)
-		# 解析response，获得totle
-		info = json.loads(response.text)
-		errorCode = info.get('errorCode')
-		if errorCode != "000000":
+		response1 = parse_page(token, proposer, 1)
+		if not response1:
 			continue
-		# page = info.get('page')
-		total = info.get('total')
-		records = info.get('context').get('records')
+		(total1, values1) = response1
 		# 通过total确定循环次数
 		# 加入9999次，pages=100页
-		pages = math.ceil(int(total) / 100)
+		pages = math.ceil(int(total1) / 100)
 		if pages == 1:
 			# 直接入库  doing
-			in_zhuanli(connect, 'zhuanli_info', )
+			in_zhuanli(connect, 'zhuanli_info', values1)
 			continue
 		for p in range(2, pages + 1):
-			response = get_res('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab', proposer, 1)
-			info = json.loads(response.text)
-			errorCode = info.get('errorCode')
-			if errorCode != "000000":
+			response = parse_page(token, proposer, p)
+			if not response:
 				continue
-			# page = info.get('page')
-			total = info.get('total')
-			records = info.get('context').get('records')
-	# 入库
-	pass
-
-
-def get_values(records):
-	values = [record.values() for record in records]
+			(total, values) = response
+			in_zhuanli(connect, 'zhuanli_info', values)
 
 
 if __name__ == '__main__':
-	# access_token = get_token()
-	# print(access_token)
-	# get_api(access_token)
+	access_token = get_token()
+	print(access_token)
+	get_api(access_token)
 	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
-	pass
+	# pass
