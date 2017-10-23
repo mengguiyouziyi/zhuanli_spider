@@ -39,7 +39,8 @@ def read_xml_gen(xml_path):
 	book = xlrd.open_workbook(xml_path)
 	sheet = book.sheet_by_index(0)
 	rows = sheet.nrows
-	for row in range(1+900000, rows+1):
+	print(rows)
+	for row in range(1, rows+1):
 		vals = sheet.row_values(row)  # list，含有一列的所有信息
 		only_id = gen_id(vals[1])
 		vals.insert(1, only_id)
@@ -83,7 +84,7 @@ def in_comp(connect, vals):
 	"""
 	cur = connect.cursor()
 	# sql = """insert into zhuanli_shenqing_comp (comp_full_name, only_id, IMGTITLE, lssc, abso, tie, vu, absc, tio, abse, inc, pdfexist, agc, ape, apc, IMGNAME, ano, tic, ans, apo, ino, pns, pdt, ine, pid, pno, IMGO, pd, ipc, ad, ago, sfpns, pk) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-	sql = """insert into zhuanli_shenqing_comp (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+	sql = """insert into zhuanli_shenqing_comp_copy (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 	vl_list = [val[1:8] for val in vals]
 	cur.executemany(sql, vl_list)
 	connect.commit()
@@ -91,7 +92,7 @@ def in_comp(connect, vals):
 
 if __name__ == '__main__':
 	# val_all = read_xml('申请人名单大全1.xlsx')
-	val_all = read_xml_gen('hou.xlsx')
+	val_all = read_xml_gen('hou1.xlsx')
 	# print(val_all)
 	# for a in val_all:
 	# 	print(a)
