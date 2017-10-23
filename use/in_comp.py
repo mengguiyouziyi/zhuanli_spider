@@ -39,7 +39,7 @@ def read_xml_gen(xml_path):
 	book = xlrd.open_workbook(xml_path)
 	sheet = book.sheet_by_index(0)
 	rows = sheet.nrows
-	for row in range(1, rows):
+	for row in range(1, rows+1):
 		vals = sheet.row_values(row)  # list，含有一列的所有信息
 		only_id = gen_id(vals[1])
 		vals.insert(1, only_id)
