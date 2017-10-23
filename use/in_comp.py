@@ -92,7 +92,6 @@ def in_comp(connect, vals):
 if __name__ == '__main__':
 	# val_all = read_xml('申请人名单大全1.xlsx')
 	val_all = read_xml_gen('hou30w.xlsx')
-	print(len(val_all))
 	# print(val_all)
 	# for a in val_all:
 	# 	print(a)
@@ -107,7 +106,7 @@ if __name__ == '__main__':
 	try:
 		x = []
 		for i, v in enumerate(val_all):
-			print(i)
+			print(i+600001)
 			x.append(v)
 			if len(x) == 50000:
 				in_comp(connect, x)
