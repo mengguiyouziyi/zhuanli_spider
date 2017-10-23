@@ -108,7 +108,7 @@ if __name__ == '__main__':
 		for i, v in enumerate(val_all):
 			print(i+600001)
 			x.append(v)
-			if len(x) == 5000:
+			if len(x) == 1:
 				in_comp(connect, x)
 				x.clear()
 			else:
