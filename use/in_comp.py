@@ -83,7 +83,7 @@ def in_comp(connect, vals):
 	"""
 	cur = connect.cursor()
 	# sql = """insert into zhuanli_shenqing_comp (comp_full_name, only_id, IMGTITLE, lssc, abso, tie, vu, absc, tio, abse, inc, pdfexist, agc, ape, apc, IMGNAME, ano, tic, ans, apo, ino, pns, pdt, ine, pid, pno, IMGO, pd, ipc, ad, ago, sfpns, pk) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-	sql = """insert into zhuanli_shenqing_comp_copy (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+	sql = """insert into zhuanli_shenqing_comp (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 	vl_list = [val[1:8] for val in vals]
 	cur.executemany(sql, vl_list)
 	connect.commit()
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 		for i, v in enumerate(val_all):
 			print(i+600001)
 			x.append(v)
-			if len(x) == 1:
+			if len(x) == 50000:
 				in_comp(connect, x)
 				x.clear()
 			else:
