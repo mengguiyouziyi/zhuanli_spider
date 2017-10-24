@@ -9,7 +9,9 @@ def get_token():
 	获取access_token
 	:return:
 	"""
-	browser = webdriver.PhantomJS(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
+	phan_mac_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
+	phan_linux_path = '/home/spider/.pyenv/versions/3.5.3/bin//phantomjs'
+	browser = webdriver.PhantomJS(executable_path=phan_linux_path)
 	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 	denglu = 'http://114.251.8.193/login.jsp'
 	browser.get(denglu)

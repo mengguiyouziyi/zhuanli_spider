@@ -9,14 +9,19 @@ from getToken import get_token
 
 def get_api(access_token):
 	"""
+	用于测试
 		{"error":"invalid_token","error_description":"Invalid access token: 30e0b80a-9d22-4129-8607-46d749d97c53"}
 		23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab
 	"""
-	# connect = pymysql.connect(host='etl1.innotree.org', port=3308, user='spider', password='spider', db=db,
-	#                           charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-	# cursor = connect.cursor()
+	connect = pymysql.connect(host='etl2.innotree.org', port=3308, user='spider', password='spider', db='spider',
+	                          charset='utf8', cursorclass=pymysql.cursors.DictCursor)
+	cursor = connect.cursor()
+	sql = """select comp_full_name from zhuanli_shenqing_comp limit 12000"""
+	cursor.execute(sql)
+	results = cursor.fetchall()
+	words = [result.get('comp_full_name', '') for result in results]
 	url = "http://114.251.8.193/api/patent/search/expression"
-	words = ['中兴通讯股份有限公司', '三星电子株式会社']
+	# words = ['中兴通讯股份有限公司', '三星电子株式会社']
 
 	for j in words:
 		for i in range(100):
@@ -36,7 +41,7 @@ def get_api(access_token):
 					records = info.get('context').get('records')
 					print(len(records))
 				print(response.text)
-				time.sleep(1)
+				time.sleep(0.5)
 			except:
 				traceback.print_exc()
 				continue
@@ -48,7 +53,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select only_id, comp_full_name from zhuanli_shenqing_comp"""
+	sql = """select only_id, comp_full_name from zhuanli_shenqing_comp limit 100000"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
@@ -127,7 +132,7 @@ def parse_page(token, proposer, page):
 
 def main():
 	# 获取公司列表
-	config = {'host': 'etl2.innotree.org',
+	config = {'host': 'etl1.innotree.org',
 	          'port': 3308,
 	          'user': 'spider',
 	          'password': 'spider',
@@ -137,6 +142,7 @@ def main():
 	connect = pymysql.connect(**config)
 	results = get_comp(connect)
 	token = get_token()
+	print(token)
 	# page=1，获取response
 	for result in results:
 		proposer = result.get('comp_full_name')
@@ -160,8 +166,8 @@ def main():
 
 
 if __name__ == '__main__':
-	access_token = get_token()
-	print(access_token)
-	get_api(access_token)
+	# access_token = get_token()
+	# print(access_token)
+	# get_api(access_token)
 	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
-	# pass
+	main()
