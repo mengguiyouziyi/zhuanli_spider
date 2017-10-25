@@ -9,12 +9,13 @@ def get_token():
 	获取access_token
 	:return:
 	"""
-	phan_mac_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
-	phan_linux_path = '/home/spider/.pyenv/versions/3.5.3/bin//phantomjs'
-	browser = webdriver.PhantomJS(executable_path=phan_linux_path)
-	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
+	# phan_mac_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
+	# phan_linux_path = '/home/spider/.pyenv/versions/3.5.3/bin//phantomjs'
+	# browser = webdriver.PhantomJS(executable_path=phan_mac_path)
+	browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 	denglu = 'http://114.251.8.193/login.jsp'
 	browser.get(denglu)
+	time.sleep(0.5)
 	browser.find_element_by_id('username').send_keys('yinguoshu')
 	browser.find_element_by_id('password1').send_keys('yinguoshu')
 	browser.find_element_by_id('submitButton').click()
@@ -67,9 +68,10 @@ def get_token():
 	browser.find_element_by_id('resource_获取token').find_element_by_name('redirect_uri').send_keys(
 		'http://www.baidu.com/')
 	browser.find_element_by_id('resource_获取token').find_element_by_class_name('submit').click()
-	time.sleep(0.5)
+	time.sleep(1)
 	select = Selector(text=browser.page_source)
 	tags = select.xpath('//pre[@class="json"]/code/span[@class="hljs-string"]/text()').extract()
+	# print(tags)
 	access_token = tags[0].replace('"', '')
 	# refresh_token = tags[2].replace('"', '')
 	browser.quit()
