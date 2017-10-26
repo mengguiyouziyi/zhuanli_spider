@@ -218,7 +218,7 @@ def main():
 		except:
 			print(id, '~~~~insert error~~~~', 1)
 			print_exc()
-			return
+			continue
 
 
 # def main():
