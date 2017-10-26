@@ -32,7 +32,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp limit 50"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
@@ -82,7 +82,7 @@ def in_zhuanli(insert_con, tab, args_list):
 	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab + '_' + l_num_str, columns=columns,
 	                                                                       val=_handle_str(col_num))
 	print(insert_sql)
-	print_exc(args_list[0])
+	print(args_list[0])
 	insert_cur = insert_con.cursor()
 	# 确保入库的时候都在50条以下
 	l = len(args_list)
@@ -106,7 +106,8 @@ def get_res(token, result, page):
 	"""
 	id = result.get('id')
 	proposer = result.get('comp_full_name', '')
-	proposer.replace('(', '\(').replace(')', '\)')
+	proposer.replace('(', r'\(').replace(')', r'\)')
+	print(proposer)
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": token,
 	               "scope": "read_cn", "express": "申请人=%s" % proposer,
