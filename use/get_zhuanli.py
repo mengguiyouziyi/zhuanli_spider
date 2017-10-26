@@ -138,7 +138,7 @@ def get_update_dicts(records):
 	long_records = []
 	for record in records:
 		temp = ini_dict.copy()
-		low = {k.lower(): v for k, v in record.items()}
+		low = {k.lower(): v for k, v in OrderedDict(record).items()}
 		temp.update(low)
 		long_records.append(temp)
 	return long_records
