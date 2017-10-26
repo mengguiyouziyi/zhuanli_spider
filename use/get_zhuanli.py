@@ -32,7 +32,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp limit 10"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
@@ -75,10 +75,10 @@ def in_zhuanli(insert_con, tab, args_list):
 	:param args_list:
 	:return:
 	"""
-	columns_a = _get_column(insert_con, tab)
+	l_num_str = args_list[0][1][-1]
+	columns_a = _get_column(insert_con, tab + '_' + l_num_str)
 	col_num = len(columns_a.split(','))
 	columns = columns_a
-	l_num_str = args_list[0][1][-1]
 	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab + '_' + l_num_str, columns=columns,
 	                                                                       val=_handle_str(col_num))
 	print(insert_sql)
