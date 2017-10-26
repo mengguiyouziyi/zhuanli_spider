@@ -104,6 +104,7 @@ def get_res(token, result, page):
 	"""
 	id = result.get('id')
 	proposer = result.get('comp_full_name', '')
+	proposer.replace('(', '\(').replace(')', '\)')
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": token,
 	               "scope": "read_cn", "express": "申请人=%s" % quote_plus(proposer),
@@ -112,25 +113,33 @@ def get_res(token, result, page):
 	try:
 		response = requests.request("GET", api_url, params=querystring, timeout=10)
 	except:
-		print(id, '~~~~timeout_error~~~~', '~~~~', page)
+		print(id, '~~~~timeout error~~~~', page)
 		return
 	time.sleep(1)
 	info = json.loads(response.text)
 	errorCode = info.get('errorCode')
+	context = info.get('context')
 	if not errorCode:
-		print(id, '~~~~', response.text, '~~~~', '~~~~', page)
+		print(id, '~~~~no errorCode~~~~', page)
+		print(response.text.strip())
 		token = get_token()
 		get_res(token, result, page)
 	if errorCode == '000016':
-		print(id, '~~~~错误代码[000016] ==> 查询错误，最多只能返回查询条件前10000条数据~~~~', proposer, '~~~~', page)
+		print(id, '~~~~查询错误，最多只能返回查询条件前10000条数据~~~~', page)
 		return
 	elif errorCode == "表达式语法错误":
-		print(id, '~~~~存在语法错误，请重新编辑表达式后进行检索~~~~', '~~~~', page)
+		print(id, '~~~~存在语法错误，请重新编辑表达式后进行检索~~~~', page)
 		print(querystring)
 		return
-	elif errorCode == '000000':
+	elif errorCode == '000003':
+		print(id, '~~~~连接数据查询库异常~~~~', page)
+		return
+	elif not context:
+		print(id, '~~~~no context~~~~', page)
+		return
+	elif errorCode == '000000' and context:
 		total = info.get('total')
-		records = info.get('context').get('records')
+		records = context.get('records')
 		records = get_update_dicts(records)
 		key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc', 'vu',
 		            'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee', 'imgo',
@@ -139,7 +148,8 @@ def get_res(token, result, page):
 		values = [[record[i] for i in key_list] for record in records]
 		return (total, values)
 	else:
-		print(id, '~~~~', response.text, '~~~~', page)
+		print(id, '~~~~other error~~~~', page)
+		print(response.text.strip())
 		return
 
 
@@ -202,10 +212,10 @@ def main():
 		values = get_values(values, add_list)
 		try:
 			in_zhuanli(connect, 'zhuanli_info_all', values)
-			print(id, '~~~~', 1)
+			print(id, '~~~~success~~~~', 1)
 		except:
+			print(id, '~~~~insert error~~~~', 1)
 			print_exc()
-			print(id, '~~~~insert_error~~~~', 1)
 			continue
 
 
@@ -298,7 +308,15 @@ if __name__ == '__main__':
  442 "context" : ""^M
  443 }
 
-
+{^M
+266 "errorCode" : "000003",^M
+267 "errorDesc" : "错误代码[000003] ==> 连接数据查询库异常",^M
+268 "page_row" : "100",^M
+269 "page" : "1",^M
+270 "total" : "",^M
+271 "sort_column" : "",^M
+272 "context" : ""^M
+273 }^M
 """
 
 
