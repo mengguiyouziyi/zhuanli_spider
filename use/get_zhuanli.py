@@ -114,6 +114,7 @@ def parse_page(token, proposer, page):
 	records = info.get('context').get('records')
 
 	records = get_update_dicts(records)
+	print(records)
 
 	values = [list(record.values()) for record in records]
 	return (total, values)
