@@ -3,6 +3,7 @@ import time
 import pymysql
 import math
 import json
+from traceback import print_exc
 from collections import OrderedDict
 from getToken import get_token
 
@@ -13,7 +14,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select only_id, comp_full_name from zhuanli_shenqing_comp"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
@@ -62,13 +63,11 @@ def in_zhuanli(insert_con, tab, args_list):
 	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab, columns=columns,
 	                                                                       val=_handle_str(col_num))
 	insert_cur = insert_con.cursor()
-	# print(insert_sql)
-	# print(args_list)
 	insert_cur.executemany(insert_sql, args_list)
 	insert_con.commit()
 
 
-def get_res(access_token, proposer, page):
+def get_res(access_token, result, page):
 	"""
 	返回response api
 	:param access_token:
@@ -76,18 +75,22 @@ def get_res(access_token, proposer, page):
 	:param page: 页码
 	:return:
 	"""
+	id = result.get('id')
+	proposer = result.get('comp_full_name', '')
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": access_token,
-	               # "access_token": "30e0b80a-9d22-4129-8607-46d749d97c53",
 	               "scope": "read_cn", "express": "申请人=%s" % proposer, "page": "%s" % page, "page_row": "100"}
-	# print(querystring)
-	response = requests.request("GET", "http://114.251.8.193/api/patent/search/expression", params=querystring,
-	                            timeout=10)
+	try:
+		response = requests.request("GET", "http://114.251.8.193/api/patent/search/expression", params=querystring,
+		                            timeout=10)
+	except:
+		print(id, ' ', querystring, proposer, ' ', page)
+		return
 	time.sleep(1)
 	return response
 
 
-def parse_page(token, proposer, page):
+def parse_page(token, result, page):
 	"""
 	解析返回的api
 	:param token:
@@ -95,36 +98,37 @@ def parse_page(token, proposer, page):
 	:param page:
 	:return:
 	"""
+	id = result.get('id')
+	proposer = result.get('comp_full_name')
 	response = get_res(token, proposer, page)
-	# 解析response，获得totle
+	if not response:
+		return
 	info = json.loads(response.text)
 	errorCode = info.get('errorCode')
-	# 如果token过期了，递归调用自身
 	if not errorCode:
-		print(response.text)
-		print('error  ', proposer, '  ', page)
+		print(id, ' ', response.text, proposer, ' ', page)
 		token = get_token()
 		parse_page(token, proposer, page)
-	# 如果没过期，但返回错误
-	# 这里要分返回什么错误，如果返回接口调用次数限制，则需要打印出当前的申请人和申请的页数；
-	# 或者直接让程序阻塞，向mysql发送心跳
-	if errorCode != "000000":
-		print(response.text)
-		print('error  ', proposer, '  ', page)
+	if errorCode == '000016':
+		print(id, ' 错误代码[000016] ==> 查询错误，最多只能返回查询条件前10000条数据 ', proposer, ' ', page)
 		return None
-	# page = info.get('page')
-	total = info.get('total')
-	records = info.get('context').get('records')
-
-	records = get_update_dicts(records)
-	# print(records)
-	key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc', 'vu',
-	            'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee', 'imgo',
-	            'pdfexist', 'ans', 'pns', 'sfpns', 'inc', 'ine', 'ino', 'agc', 'age', 'ago', 'asc', 'ase', 'aso', 'exc',
-	            'exe', 'exo']
-
-	values = [[record[i] for i in key_list] for record in records]
-	return (total, values)
+	elif errorCode == "表达式语法错误":
+		print(id, ' 错误代码[表达式语法错误] ==> 当前表达式：null。存在语法错误，请重新编辑表达式后进行检索。 ', proposer, ' ', page)
+		return None
+	elif errorCode == '000000':
+		total = info.get('total')
+		records = info.get('context').get('records')
+		records = get_update_dicts(records)
+		key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc', 'vu',
+		            'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee', 'imgo',
+		            'pdfexist', 'ans', 'pns', 'sfpns', 'inc', 'ine', 'ino', 'agc', 'age', 'ago', 'asc', 'ase', 'aso',
+		            'exc',
+		            'exe', 'exo']
+		values = [[record[i] for i in key_list] for record in records]
+		return (total, values)
+	else:
+		print(id, ' ', response.text, proposer, ' ', page)
+		return None
 
 
 def get_update_dicts(records):
@@ -133,7 +137,6 @@ def get_update_dicts(records):
 	:param records:
 	:return:
 	"""
-	# ini_dict = {'IMGTITLE': '', 'lssc': '', 'abso': '', 'tie': '', 'vu': '', 'absc': '', 'tio': '', 'abse': '', 'inc': '', 'pdfexist': '', 'agc': '', 'ape': '', 'age': '', 'apc': '', 'IMGNAME': '', 'ano': '', 'tic': '', 'ans': '', 'apo': '', 'ino': '', 'pns': '', 'pdt': '', 'ine': '', 'pid': '', 'pno': '', 'IMGO': '', 'exo': '', 'pd': '', 'asc': '', 'ipc': '', 'ase': '', 'aso': '', 'ad': '', 'exc': '', 'ago': '', 'sfpns': '', 'pk': ''}
 	ini_dict = {"pid": "", "tic": "", "tie": "", "tio": "", "ano": "", "ad": "", "pd": "", "pk": "", "pno": "",
 	            "apo": "", "ape": "", "apc": "", "ipc": "", "lc": "", "vu": "", "abso": "", "abse": "", "absc": "",
 	            "imgtitle": "", "imgname": "", "lssc": "", "pdt": "", "debec": "", "debeo": "", "debee": "", "imgo": "",
@@ -146,20 +149,6 @@ def get_update_dicts(records):
 		temp.update(low)
 		long_records.append(temp)
 	return long_records
-
-
-def max_record(records):
-	"""
-	获取最大的record
-	:param records:
-	:return:
-	"""
-	len_list = [len(r) for r in records]
-	print(max(len_list))
-	max_index = len_list.index(max(len_list))
-	print(records[max_index])
-	ini_dict = {}.fromkeys(records[max_index].keys(), '')
-	print(ini_dict)
 
 
 def get_values(values, only_id, proposer, total):
@@ -189,10 +178,12 @@ def main():
 	token = get_token()
 	# print(token)
 	# page=1，获取response
-	for i, result in enumerate(results):
+	for result in results:
+		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		if proposer == '国家电网公司':
+		if id <= 603 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398, 476,
+		                      479, 482, 486, 499, 544, 545, 564, 572, 577, 590]:
 			continue
 		response = parse_page(token, proposer, 1)
 		if not response:
@@ -200,8 +191,7 @@ def main():
 		(total, values) = response
 		values = get_values(values, only_id, proposer, total)
 		in_zhuanli(connect, 'zhuanli_info_all', values)
-		print(i+1, '  ', proposer, '  ', 1)
-
+	# print(id, ' ', proposer, ' ', 1)
 
 
 # def main():
@@ -272,7 +262,6 @@ if __name__ == '__main__':
 	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
 	main()
 
-
 """各种错误
 {^M
 338 "errorCode" : "000016",^M
@@ -284,5 +273,29 @@ if __name__ == '__main__':
 344 "context" : ""^M
 345 }
 
+{^M
+ 436 "errorCode" : "表达式语法错误",^M
+ 437 "errorDesc" : "错误代码[表达式语法错误] ==> 当前表达式：null。存在语法错误，请重新编辑表达式后进行检索。",^M
+ 438 "page_row" : "",^M
+ 439 "page" : "",^M
+ 440 "total" : "",^M
+ 441 "sort_column" : "",^M
+ 442 "context" : ""^M
+ 443 }
+
 
 """
+
+
+# def max_record(records):
+# 	"""
+# 	获取最大的record
+# 	:param records:
+# 	:return:
+# 	"""
+# 	len_list = [len(r) for r in records]
+# 	print(max(len_list))
+# 	max_index = len_list.index(max(len_list))
+# 	print(records[max_index])
+# 	ini_dict = {}.fromkeys(records[max_index].keys(), '')
+# 	print(ini_dict)
