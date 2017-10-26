@@ -100,7 +100,7 @@ def parse_page(token, result, page):
 	"""
 	id = result.get('id')
 	proposer = result.get('comp_full_name')
-	response = get_res(token, proposer, page)
+	response = get_res(token, result, page)
 	if not response:
 		return
 	info = json.loads(response.text)
