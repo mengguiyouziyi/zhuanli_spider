@@ -105,7 +105,6 @@ def get_res(token, result, page):
 	id = result.get('id')
 	proposer = result.get('comp_full_name', '')
 	proposer = proposer.replace('(', r'\(').replace(')', r'\)')
-	print(proposer)
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": token,
 	               "scope": "read_cn", "express": "申请人=%s" % proposer,
@@ -114,29 +113,31 @@ def get_res(token, result, page):
 	try:
 		response = requests.request("GET", api_url, params=querystring, timeout=10)
 	except:
-		print(id, '~~~~timeout error~~~~', page)
+		print(id, '~~timeout error~~', page)
 		return
 	time.sleep(1)
 	info = json.loads(response.text)
 	errorCode = info.get('errorCode')
 	context = info.get('context')
 	if not errorCode:
-		print(id, '~~~~no errorCode~~~~', page)
+		print(id, '~~no errorCode~~', page)
 		print(response.text.strip())
-		token = get_token()
-		get_res(token, result, page)
+		return -1
 	if errorCode == '000016':
-		print(id, '~~~~查询错误，最多只能返回查询条件前10000条数据~~~~', page)
+		# 查询错误，最多只能返回查询条件前10000条数据
+		print(id, '~~code:000016 Query error, only return the first 10000~~', page)
 		return
 	elif errorCode == "表达式语法错误":
-		print(id, '~~~~存在语法错误，请重新编辑表达式后进行检索~~~~', page)
+		# 存在语法错误，请重新编辑表达式后进行检索
+		print(id, '~~Syntax error~~', page)
 		print(querystring)
 		return
 	elif errorCode == '000003':
-		print(id, '~~~~连接数据查询库异常~~~~', page)
+		# 连接数据查询库异常
+		print(id, '~~code:000003 Connecting data query base exceptions~~', page)
 		return
 	elif not context:
-		print(id, '~~~~no context~~~~', page)
+		print(id, '~~no context~~', page)
 		return
 	elif errorCode == '000000' and context:
 		total = info.get('total')
@@ -149,7 +150,7 @@ def get_res(token, result, page):
 		values = [[record[i] for i in key_list] for record in records]
 		return (total, values)
 	else:
-		print(id, '~~~~other error~~~~', page)
+		print(id, '~~other error~~', page)
 		print(response.text.strip())
 		return
 
@@ -197,6 +198,7 @@ def main():
 	          'cursorclass': pymysql.cursors.DictCursor}
 	connect = pymysql.connect(**config)
 	results = get_comp(connect)
+	# 第一次给予token
 	token = get_token()
 	for result in results:
 		id = result.get('id')
@@ -205,7 +207,12 @@ def main():
 		# if id <= 642 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398,
 		#                             476, 479, 482, 486, 499, 544, 545, 564, 572, 577, 590, 604, 635]:
 		# 	continue
+		# 使用token获取结果, 注意使用的是循环外的token
 		response = get_res(token, result, 1)
+		if response == -1:
+			# 如果token失效，重新获取token，下次循环的时候token也是这个新token
+			token = get_token()
+			response = get_res(token, result, 1)
 		if not response:
 			continue
 		(total, values) = response
@@ -213,9 +220,9 @@ def main():
 		values = get_values(values, add_list)
 		try:
 			in_zhuanli(connect, 'zhuanli_info_all', values)
-			print(id, '~~~~success~~~~', 1)
+			print(id, '~~success~~', 1)
 		except:
-			print(id, '~~~~insert error~~~~', 1)
+			print(id, '~~insert error~~', 1)
 			print_exc()
 			continue
 
