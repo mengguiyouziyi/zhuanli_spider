@@ -3,6 +3,7 @@ import time
 import pymysql
 import math
 import json
+from collections import OrderedDict
 from getToken import get_token
 
 
@@ -118,7 +119,7 @@ def parse_page(token, proposer, page):
 	records = get_update_dicts(records)
 	print(records)
 
-	values = [list(record.values()) for record in records]
+	values = [list(OrderedDict(record).values()) for record in records]
 	return (total, values)
 
 
