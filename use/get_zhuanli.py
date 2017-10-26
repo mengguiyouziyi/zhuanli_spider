@@ -101,7 +101,7 @@ def parse_page(token, proposer, page):
 	errorCode = info.get('errorCode')
 	# 如果token过期了，递归调用自身
 	if not errorCode:
-		print(response)
+		print(response.text)
 		print('error  ', proposer, '  ', page)
 		token = get_token()
 		parse_page(token, proposer, page)
@@ -109,7 +109,7 @@ def parse_page(token, proposer, page):
 	# 这里要分返回什么错误，如果返回接口调用次数限制，则需要打印出当前的申请人和申请的页数；
 	# 或者直接让程序阻塞，向mysql发送心跳
 	if errorCode != "000000":
-		print(response)
+		print(response.text)
 		print('error  ', proposer, '  ', page)
 		return None
 	# page = info.get('page')
@@ -192,11 +192,30 @@ def main():
 	for result in results:
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		response1 = parse_page(token, proposer, 1)
-		# print(response1)
-		if not response1:
+		if proposer == '国家电网公司':
+			(total1, values1) = parse_page(token, proposer, 101)
+			if not (total1, values1):
+				continue
+			values1 = get_values(values1, only_id, proposer, total1)
+			# 通过total确定循环次数
+			# 加入9999次，pages=100页
+			pages = math.ceil(int(total1) / 100)
+			in_zhuanli(connect, 'zhuanli_info_all', values1)
+			print(proposer, '  ', 101)
+			if pages == 1:
+				continue
+			for p in range(102, pages + 1):
+				(total, values) = parse_page(token, proposer, p)
+				if not (total, values):
+					continue
+				values = get_values(values, only_id, proposer, total)
+				in_zhuanli(connect, 'zhuanli_info_all', values)
+				print(proposer, '  ', p)
 			continue
-		(total1, values1) = response1
+
+		(total1, values1) = parse_page(token, proposer, 1)
+		if not (total1, values1):
+			continue
 		values1 = get_values(values1, only_id, proposer, total1)
 		# 通过total确定循环次数
 		# 加入9999次，pages=100页
@@ -206,13 +225,13 @@ def main():
 		if pages == 1:
 			continue
 		for p in range(2, pages + 1):
-			response = parse_page(token, proposer, p)
-			if not response:
+			(total, values) = parse_page(token, proposer, p)
+			if not (total, values):
 				continue
-			(total, values) = response
 			values = get_values(values, only_id, proposer, total)
 			in_zhuanli(connect, 'zhuanli_info_all', values)
 			print(proposer, '  ', p)
+
 
 
 if __name__ == '__main__':
