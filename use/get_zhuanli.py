@@ -81,8 +81,6 @@ def in_zhuanli(insert_con, tab, args_list):
 	columns = columns_a
 	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab + '_' + l_num_str, columns=columns,
 	                                                                       val=_handle_str(col_num))
-	print(insert_sql)
-	print(args_list[0])
 	insert_cur = insert_con.cursor()
 	# 确保入库的时候都在50条以下
 	l = len(args_list)
