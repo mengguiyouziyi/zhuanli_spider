@@ -3,9 +3,25 @@ import time
 import pymysql
 import math
 import json
+import logging
 from traceback import print_exc
 from collections import OrderedDict
 from getToken import get_token
+
+
+# # 创建一个logger
+# logger = logging.getLogger('RegistAddr_Log')
+# logger.setLevel(logging.DEBUG)
+#
+# # 创建一个handler，用于写入日志文件
+# fh = logging.FileHandler('./lib/RegistAddr.log')
+# # fh.setLevel(logging.DEBUG)
+#
+# # 定义handler的输出格式
+# formatter = logging.Formatter('%(asctime)s - %(process)d - %(levelname)s - %(message)s')
+# fh.setFormatter(formatter)
+# logger.addHandler(fh)
+# # ---------↑↑↑↑↑↑↑定义日志↑↑↑↑↑↑↑↑-----------
 
 
 def get_comp(connect):
@@ -67,7 +83,7 @@ def in_zhuanli(insert_con, tab, args_list):
 	insert_con.commit()
 
 
-def get_res(access_token, result, page):
+def get_res(token, result, page):
 	"""
 	返回response api
 	:param access_token:
@@ -78,43 +94,28 @@ def get_res(access_token, result, page):
 	id = result.get('id')
 	proposer = result.get('comp_full_name', '')
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
-	               "access_token": access_token,
+	               "access_token": token,
 	               "scope": "read_cn", "express": "申请人=%s" % proposer, "page": "%s" % page, "page_row": "100"}
+	api_url = "http://114.251.8.193/api/patent/search/expression"
 	try:
-		response = requests.request("GET", "http://114.251.8.193/api/patent/search/expression", params=querystring,
-		                            timeout=10)
+		response = requests.request("POST", api_url, data=querystring, timeout=10)
 	except:
-		print(id, ' ', querystring, proposer, ' ', page)
+		print(id, '~~~~timeout_error~~~~', proposer, '~~~~', page)
 		return
 	time.sleep(1)
-	return response
-
-
-def parse_page(token, result, page):
-	"""
-	解析返回的api
-	:param token:
-	:param proposer: 申请人
-	:param page:
-	:return:
-	"""
-	id = result.get('id')
-	proposer = result.get('comp_full_name')
-	response = get_res(token, result, page)
-	if not response:
-		return
 	info = json.loads(response.text)
 	errorCode = info.get('errorCode')
 	if not errorCode:
-		print(id, ' ', response.text, proposer, ' ', page)
+		print(id, '~~~~', response.text, '~~~~', proposer, '~~~~', page)
 		token = get_token()
-		parse_page(token, proposer, page)
+		get_res(token, result, page)
 	if errorCode == '000016':
-		print(id, ' 错误代码[000016] ==> 查询错误，最多只能返回查询条件前10000条数据 ', proposer, ' ', page)
-		return None
+		print(id, '~~~~错误代码[000016] ==> 查询错误，最多只能返回查询条件前10000条数据~~~~', proposer, '~~~~', page)
+		return
 	elif errorCode == "表达式语法错误":
-		print(id, ' 错误代码[表达式语法错误] ==> 当前表达式：null。存在语法错误，请重新编辑表达式后进行检索。 ', proposer, ' ', page)
-		return None
+		print(id, '~~~~错误代码[表达式语法错误] ==> 当前表达式：null。存在语法错误，请重新编辑表达式后进行检索。~~~~', proposer, '~~~~', page)
+		print(querystring)
+		return
 	elif errorCode == '000000':
 		total = info.get('total')
 		records = info.get('context').get('records')
@@ -122,13 +123,12 @@ def parse_page(token, result, page):
 		key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc', 'vu',
 		            'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee', 'imgo',
 		            'pdfexist', 'ans', 'pns', 'sfpns', 'inc', 'ine', 'ino', 'agc', 'age', 'ago', 'asc', 'ase', 'aso',
-		            'exc',
-		            'exe', 'exo']
+		            'exc', 'exe', 'exo']
 		values = [[record[i] for i in key_list] for record in records]
 		return (total, values)
 	else:
-		print(id, ' ', response.text, proposer, ' ', page)
-		return None
+		print(id, '~~~~', response.text, '~~~~', proposer, '~~~~', page)
+		return
 
 
 def get_update_dicts(records):
@@ -176,22 +176,20 @@ def main():
 	connect = pymysql.connect(**config)
 	results = get_comp(connect)
 	token = get_token()
-	# print(token)
-	# page=1，获取response
 	for result in results:
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		if id <= 603 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398, 476,
-		                      479, 482, 486, 499, 544, 545, 564, 572, 577, 590]:
+		if id <= 642 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398, 476,
+		                      479, 482, 486, 499, 544, 545, 564, 572, 577, 590, 604, 635]:
 			continue
-		response = parse_page(token, result, 1)
+		response = get_res(token, result, 1)
 		if not response:
 			continue
 		(total, values) = response
 		values = get_values(values, only_id, proposer, total)
 		in_zhuanli(connect, 'zhuanli_info_all', values)
-	# print(id, ' ', proposer, ' ', 1)
+		print(id, '~~~~', proposer, '~~~~', 1)
 
 
 # def main():
