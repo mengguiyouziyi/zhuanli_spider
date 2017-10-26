@@ -32,7 +32,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp limit 50"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp limit 10, 4"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
@@ -106,7 +106,7 @@ def get_res(token, result, page):
 	"""
 	id = result.get('id')
 	proposer = result.get('comp_full_name', '')
-	proposer.replace('(', r'\(').replace(')', r'\)')
+	proposer = proposer.replace('(', r'\(').replace(')', r'\)')
 	print(proposer)
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": token,
