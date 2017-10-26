@@ -117,9 +117,13 @@ def parse_page(token, proposer, page):
 	records = info.get('context').get('records')
 
 	records = get_update_dicts(records)
-	print(records)
+	# print(records)
+	key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc', 'vu',
+	            'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee', 'imgo',
+	            'pdfexist', 'ans', 'pns', 'sfpns', 'inc', 'ine', 'ino', 'agc', 'age', 'ago', 'asc', 'ase', 'aso', 'exc',
+	            'exe', 'exo']
 
-	values = [list(OrderedDict(record).values()) for record in records]
+	values = [[record[i] for i in key_list] for record in records]
 	return (total, values)
 
 
