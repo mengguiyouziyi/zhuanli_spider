@@ -100,6 +100,7 @@ def parse_page(token, proposer, page):
 	errorCode = info.get('errorCode')
 	# 如果token过期了，递归调用自身
 	if not errorCode:
+		print(response)
 		print('error  ', proposer, '  ', page)
 		token = get_token()
 		parse_page(token, proposer, page)
@@ -107,6 +108,7 @@ def parse_page(token, proposer, page):
 	# 这里要分返回什么错误，如果返回接口调用次数限制，则需要打印出当前的申请人和申请的页数；
 	# 或者直接让程序阻塞，向mysql发送心跳
 	if errorCode != "000000":
+		print(response)
 		print('error  ', proposer, '  ', page)
 		return None
 	# page = info.get('page')
