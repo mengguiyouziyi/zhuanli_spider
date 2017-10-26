@@ -107,7 +107,7 @@ def get_res(token, result, page):
 	proposer.replace('(', '\(').replace(')', '\)')
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": token,
-	               "scope": "read_cn", "express": "申请人=%s" % quote_plus(proposer),
+	               "scope": "read_cn", "express": "申请人=%s" % proposer,
 	               "page": "%s" % page, "page_row": "100"}
 	api_url = "http://114.251.8.193/api/patent/search/expression"
 	try:
