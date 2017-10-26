@@ -4,7 +4,9 @@ import pymysql
 import math
 import json
 import logging
+from urllib.parse import quote_plus
 from traceback import print_exc
+from more_itertools import chunked
 from collections import OrderedDict
 from getToken import get_token
 
@@ -76,11 +78,20 @@ def in_zhuanli(insert_con, tab, args_list):
 	columns_a = _get_column(insert_con, tab)
 	col_num = len(columns_a.split(','))
 	columns = columns_a
-	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab, columns=columns,
+	l_num_str = args_list[0][1][-1]
+	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab + '_' + l_num_str, columns=columns,
 	                                                                       val=_handle_str(col_num))
 	insert_cur = insert_con.cursor()
-	insert_cur.executemany(insert_sql, args_list)
-	insert_con.commit()
+	# 确保入库的时候都在50条以下
+	l = len(args_list)
+	if l >= 50:
+		aux = list(chunked(args_list, math.ceil(l / 2)))
+		for a in aux:
+			insert_cur.executemany(insert_sql, a)
+			insert_con.commit()
+	else:
+		insert_cur.executemany(insert_sql, args_list)
+		insert_con.commit()
 
 
 def get_res(token, result, page):
@@ -95,25 +106,26 @@ def get_res(token, result, page):
 	proposer = result.get('comp_full_name', '')
 	querystring = {"client_id": "6050f8adac110002270d833aed28242d",
 	               "access_token": token,
-	               "scope": "read_cn", "express": "申请人=%s" % proposer, "page": "%s" % page, "page_row": "100"}
+	               "scope": "read_cn", "express": "申请人=%s" % quote_plus(proposer),
+	               "page": "%s" % page, "page_row": "100"}
 	api_url = "http://114.251.8.193/api/patent/search/expression"
 	try:
-		response = requests.request("POST", api_url, data=querystring, timeout=10)
+		response = requests.request("GET", api_url, params=querystring, timeout=10)
 	except:
-		print(id, '~~~~timeout_error~~~~', proposer, '~~~~', page)
+		print(id, '~~~~timeout_error~~~~', '~~~~', page)
 		return
 	time.sleep(1)
 	info = json.loads(response.text)
 	errorCode = info.get('errorCode')
 	if not errorCode:
-		print(id, '~~~~', response.text, '~~~~', proposer, '~~~~', page)
+		print(id, '~~~~', response.text, '~~~~', '~~~~', page)
 		token = get_token()
 		get_res(token, result, page)
 	if errorCode == '000016':
 		print(id, '~~~~错误代码[000016] ==> 查询错误，最多只能返回查询条件前10000条数据~~~~', proposer, '~~~~', page)
 		return
 	elif errorCode == "表达式语法错误":
-		print(id, '~~~~错误代码[表达式语法错误] ==> 当前表达式：null。存在语法错误，请重新编辑表达式后进行检索。~~~~', proposer, '~~~~', page)
+		print(id, '~~~~存在语法错误，请重新编辑表达式后进行检索~~~~', '~~~~', page)
 		print(querystring)
 		return
 	elif errorCode == '000000':
@@ -127,7 +139,7 @@ def get_res(token, result, page):
 		values = [[record[i] for i in key_list] for record in records]
 		return (total, values)
 	else:
-		print(id, '~~~~', response.text, '~~~~', proposer, '~~~~', page)
+		print(id, '~~~~', response.text, '~~~~', page)
 		return
 
 
@@ -151,7 +163,7 @@ def get_update_dicts(records):
 	return long_records
 
 
-def get_values(values, only_id, proposer, total):
+def get_values(values, add_list):
 	"""
 	将元素添加到list行首
 	:param values:
@@ -160,12 +172,11 @@ def get_values(values, only_id, proposer, total):
 	:param total:
 	:return:
 	"""
-	values = [[only_id, proposer, total] + value for value in values]
+	values = [add_list + value for value in values]
 	return values
 
 
 def main():
-	# 获取公司列表
 	config = {'host': 'etl1.innotree.org',
 	          'port': 3308,
 	          'user': 'spider',
@@ -180,16 +191,22 @@ def main():
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		if id <= 642 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398, 476,
-		                      479, 482, 486, 499, 544, 545, 564, 572, 577, 590, 604, 635]:
-			continue
+		# if id <= 642 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398,
+		#                             476, 479, 482, 486, 499, 544, 545, 564, 572, 577, 590, 604, 635]:
+		# 	continue
 		response = get_res(token, result, 1)
 		if not response:
 			continue
 		(total, values) = response
-		values = get_values(values, only_id, proposer, total)
-		in_zhuanli(connect, 'zhuanli_info_all', values)
-		print(id, '~~~~', proposer, '~~~~', 1)
+		add_list = [id, only_id, proposer, total]
+		values = get_values(values, add_list)
+		try:
+			in_zhuanli(connect, 'zhuanli_info_all', values)
+			print(id, '~~~~', 1)
+		except:
+			print_exc()
+			print(id, '~~~~insert_error~~~~', 1)
+			continue
 
 
 # def main():
