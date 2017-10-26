@@ -189,48 +189,79 @@ def main():
 	token = get_token()
 	# print(token)
 	# page=1，获取response
-	for result in results:
+	for i, result in enumerate(results):
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
 		if proposer == '国家电网公司':
-			(total1, values1) = parse_page(token, proposer, 101)
-			if not (total1, values1):
-				continue
-			values1 = get_values(values1, only_id, proposer, total1)
-			# 通过total确定循环次数
-			# 加入9999次，pages=100页
-			pages = math.ceil(int(total1) / 100)
-			in_zhuanli(connect, 'zhuanli_info_all', values1)
-			print(proposer, '  ', 101)
-			if pages == 1:
-				continue
-			for p in range(102, pages + 1):
-				(total, values) = parse_page(token, proposer, p)
-				if not (total, values):
-					continue
-				values = get_values(values, only_id, proposer, total)
-				in_zhuanli(connect, 'zhuanli_info_all', values)
-				print(proposer, '  ', p)
 			continue
+		response = parse_page(token, proposer, 1)
+		if not response:
+			continue
+		(total, values) = response
+		values = get_values(values, only_id, proposer, total)
+		in_zhuanli(connect, 'zhuanli_info_all', values)
+		print(i+1, '  ', proposer, '  ', 1)
 
-		(total1, values1) = parse_page(token, proposer, 1)
-		if not (total1, values1):
-			continue
-		values1 = get_values(values1, only_id, proposer, total1)
-		# 通过total确定循环次数
-		# 加入9999次，pages=100页
-		pages = math.ceil(int(total1) / 100)
-		in_zhuanli(connect, 'zhuanli_info_all', values1)
-		print(proposer, '  ', 1)
-		if pages == 1:
-			continue
-		for p in range(2, pages + 1):
-			(total, values) = parse_page(token, proposer, p)
-			if not (total, values):
-				continue
-			values = get_values(values, only_id, proposer, total)
-			in_zhuanli(connect, 'zhuanli_info_all', values)
-			print(proposer, '  ', p)
+
+
+# def main():
+# 	# 获取公司列表
+# 	config = {'host': 'etl1.innotree.org',
+# 	          'port': 3308,
+# 	          'user': 'spider',
+# 	          'password': 'spider',
+# 	          'db': 'spider',
+# 	          'charset': 'utf8',
+# 	          'cursorclass': pymysql.cursors.DictCursor}
+# 	connect = pymysql.connect(**config)
+# 	results = get_comp(connect)
+# 	token = get_token()
+# 	# print(token)
+# 	# page=1，获取response
+# 	for result in results:
+# 		only_id = result.get('only_id')
+# 		proposer = result.get('comp_full_name')
+# 		if proposer == '国家电网公司':
+# 			(total1, values1) = parse_page(token, proposer, 101)
+# 			if not (total1, values1):
+# 				continue
+# 			values1 = get_values(values1, only_id, proposer, total1)
+# 			# 通过total确定循环次数
+# 			# 加入9999次，pages=100页
+# 			pages = math.ceil(int(total1) / 100)
+# 			in_zhuanli(connect, 'zhuanli_info_all', values1)
+# 			print(proposer, '  ', 101)
+# 			if pages == 1:
+# 				continue
+# 			for p in range(102, pages + 1):
+# 				(total, values) = parse_page(token, proposer, p)
+# 				if not (total, values):
+# 					continue
+# 				values = get_values(values, only_id, proposer, total)
+# 				in_zhuanli(connect, 'zhuanli_info_all', values)
+# 				print(proposer, '  ', p)
+# 			continue
+#
+# 		response1 = parse_page(token, proposer, 1)
+# 		if not response1:
+# 			continue
+# 		(total1, values1) = response1
+# 		values1 = get_values(values1, only_id, proposer, total1)
+# 		# 通过total确定循环次数
+# 		# 加入9999次，pages=100页
+# 		pages = math.ceil(int(total1) / 100)
+# 		in_zhuanli(connect, 'zhuanli_info_all', values1)
+# 		print(proposer, '  ', 1)
+# 		if pages == 1:
+# 			continue
+# 		for p in range(2, pages + 1):
+# 			response = parse_page(token, proposer, p)
+# 			if not response:
+# 				continue
+# 			(total, values) = response
+# 			values = get_values(values, only_id, proposer, total)
+# 			in_zhuanli(connect, 'zhuanli_info_all', values)
+# 			print(proposer, '  ', p)
 
 
 
@@ -240,3 +271,18 @@ if __name__ == '__main__':
 	# get_api(access_token)
 	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
 	main()
+
+
+"""各种错误
+{^M
+338 "errorCode" : "000016",^M
+339 "errorDesc" : "错误代码[000016] ==> 查询错误，最多只能返回查询条件前10000条数据",^M
+340 "page_row" : "",^M
+341 "page" : "",^M
+342 "total" : "",^M
+343 "sort_column" : "",^M
+344 "context" : ""^M
+345 }
+
+
+"""
