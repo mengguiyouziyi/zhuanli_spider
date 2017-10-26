@@ -185,7 +185,7 @@ def main():
 		if id <= 603 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398, 476,
 		                      479, 482, 486, 499, 544, 545, 564, 572, 577, 590]:
 			continue
-		response = parse_page(token, proposer, 1)
+		response = parse_page(token, result, 1)
 		if not response:
 			continue
 		(total, values) = response
