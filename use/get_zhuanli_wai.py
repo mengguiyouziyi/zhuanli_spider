@@ -32,7 +32,7 @@ try:
 		comp_full_name = [result['comp_full_name'] for result in results]
 		so = str(tuple(comp_full_name))
 		print(so)
-		sql_1 = """select * from patent_{0} WHERE applicantName in ({1})""".format(str(i), so)
+		sql_1 = """select * from patent_{0} WHERE applicantName in {1}""".format(str(i), so)
 		print(sql_1)
 		# sql_1 = """select * from patent_{0} WHERE applicantName LIKE '{1}'""".format(str(i), ('%' + result['comp_full_name'] + '%'))
 		etl_cur.execute(sql_1)
