@@ -20,7 +20,6 @@ etl = pymysql.connect(**etl_config)
 etl.select_db('spider')
 etl_cur = etl.cursor()
 
-
 """create table zhuanli_patent_wai select patent.* from patent_1 LEFT JOIN zhuanli_wai_comp on applicantName LIKE concat('%', comp_full_name, '%')"""
 
 try:
@@ -31,13 +30,19 @@ try:
 	m = 0
 	for result in results:
 		for i in range(1, 12):
-			sql_1 = """select * from patent_{0} WHERE applicantName LIKE {1}""".format(str(i), ('%'+result['comp_full_name']+'%'))
+			sql_1 = """select * from patent_{0} WHERE applicantName LIKE {1}""".format(str(i), (
+			'%' + result['comp_full_name'] + '%'))
+			print(sql_1)
 			etl_cur.execute(sql_1)
 			results_1 = etl_cur.fetchall()
 			m += len(results_1)
 			print(m)
 			sql_2 = """insert into zhuanli_patent_wai (pid,appNumber,pubNumber,appDate,pubDate,title,ipc,applicantName,inventroName,family,agencyName,agentName,addrProvince,addrCity,addrCounty,address,patType,abs,lprs,draws,dbName,tifDistributePath,pages,proCode,appCoun,gazettePath,gazettePage,gazetteCount,statusCode,familyNo,legalStatus,mainIpc,appResource,cl,patentWords,page) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-			l = ['pid', 'appNumber', 'pubNumber', 'appDate', 'pubDate', 'title', 'ipc', 'applicantName', 'inventroName', 'family', 'agencyName', 'agentName', 'addrProvince', 'addrCity', 'addrCounty', 'address', 'patType', 'abs', 'lprs', 'draws', 'dbName', 'tifDistributePath', 'pages', 'proCode', 'appCoun', 'gazettePath', 'gazettePage', 'gazetteCount', 'statusCode', 'familyNo', 'legalStatus', 'mainIpc', 'appResource', 'cl', 'patentWords', 'page']
+			l = ['pid', 'appNumber', 'pubNumber', 'appDate', 'pubDate', 'title', 'ipc', 'applicantName', 'inventroName',
+			     'family', 'agencyName', 'agentName', 'addrProvince', 'addrCity', 'addrCounty', 'address', 'patType',
+			     'abs', 'lprs', 'draws', 'dbName', 'tifDistributePath', 'pages', 'proCode', 'appCoun', 'gazettePath',
+			     'gazettePage', 'gazetteCount', 'statusCode', 'familyNo', 'legalStatus', 'mainIpc', 'appResource', 'cl',
+			     'patentWords', 'page']
 			values = [[record[i] for i in l] for record in results_1]
 			etl_cur.executemany(sql_2, values)
 			etl.commit()
@@ -45,9 +50,3 @@ except:
 	traceback.print_exc()
 finally:
 	etl.close()
-
-
-
-
-
-
