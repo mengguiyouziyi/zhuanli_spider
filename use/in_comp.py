@@ -67,7 +67,7 @@ def read_xml_gen(xml_path):
 	:return:
 	"""
 	book = xlrd.open_workbook(xml_path)
-	sheet = book.sheet_by_index(0)
+	sheet = book.sheet_by_index(1)
 	rows = sheet.nrows
 	print(rows)
 	for row in range(1, rows + 1):
@@ -87,8 +87,10 @@ def in_comp(connect, vals):
 	cur = connect.cursor()
 	# sql = """insert into zhuanli_wai_comp (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 	# vl_list = [val[1:8] for val in vals]
-	sql = """insert into zhuanli_xiongan_comp (comp_full_name,one,two,three,tag,change_gai,industry,chain,segment,subsegment,short,cid,ncid,edate,province,city,intro,product_lines,lunci,last_rongzi,rongzi_jine,rongzi_lunci,leiji_rongzi_jine,touzi_jigou,dau,uv) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-	vl_list = [val[:] for val in vals]
+	# sql = """insert into zhuanli_xiongan_comp (comp_full_name,one,two,three,tag,change_gai,industry,chain,segment,subsegment,short,cid,ncid,edate,province,city,intro,product_lines,lunci,last_rongzi,rongzi_jine,rongzi_lunci,leiji_rongzi_jine,touzi_jigou,dau,uv) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+	# vl_list = [val[:] for val in vals]
+	sql = """insert into zhuanli_wai_comp_che (comp_full_name) VALUES (%s)"""
+	vl_list = [val[1:2] for val in vals]
 	print(len(vl_list[0]))
 	for a in vl_list[0]:
 		print(a)
@@ -97,7 +99,7 @@ def in_comp(connect, vals):
 
 
 def main():
-	val_all = read_xml_gen('科技金融-雄安项目企业清单.xlsx')
+	val_all = read_xml_gen('国外-科技金融100家(2).xlsx')
 	config = {'host': 'etl2.innotree.org',
 	          'port': 3308,
 	          'user': 'spider',

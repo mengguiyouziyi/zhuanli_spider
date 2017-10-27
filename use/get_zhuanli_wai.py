@@ -23,35 +23,39 @@ etl_cur = etl.cursor()
 """create table zhuanli_patent_wai select patent.* from patent_1 LEFT JOIN zhuanli_wai_comp on applicantName LIKE concat('%', comp_full_name, '%')"""
 
 try:
-	sql = """select comp_full_name from zhuanli_wai_comp"""
+	sql = """select comp_full_name from zhuanli_wai_comp_che"""
 	etl_cur.execute(sql)
 	results = etl_cur.fetchall()
 
 	m = 0
-	for i in range(1, 12):
-		comp_full_name = [result['comp_full_name'] for result in results]
-		so = str(tuple(comp_full_name))
-		# print(so)
-		sql_1 = """select * from patent_{0} WHERE applicantName in {1}""".format(str(i), so)
-		# print(sql_1)
-		# sql_1 = """select * from patent_{0} WHERE applicantName LIKE '{1}'""".format(str(i), ('%' + result['comp_full_name'] + '%'))
-		etl_cur.execute(sql_1)
-		results_1 = etl_cur.fetchall()
-		m += len(results_1)
-		print(m)
-		sql_2 = """insert into zhuanli_patent_wai (pid,appNumber,pubNumber,appDate,pubDate,title,ipc,applicantName,inventroName,family,agencyName,agentName,addrProvince,addrCity,addrCounty,address,patType,abs,lprs,draws,dbName,tifDistributePath,pages,proCode,appCoun,gazettePath,gazettePage,gazetteCount,statusCode,familyNo,legalStatus,mainIpc,appResource,cl,patentWords,page) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-		l = ['pid', 'appNumber', 'pubNumber', 'appDate', 'pubDate', 'title', 'ipc', 'applicantName', 'inventroName',
-		     'family', 'agencyName', 'agentName', 'addrProvince', 'addrCity', 'addrCounty', 'address', 'patType',
-		     'abs', 'lprs', 'draws', 'dbName', 'tifDistributePath', 'pages', 'proCode', 'appCoun', 'gazettePath',
-		     'gazettePage', 'gazetteCount', 'statusCode', 'familyNo', 'legalStatus', 'mainIpc', 'appResource', 'cl',
-		     'patentWords', 'page']
-		values = [[record[i] for i in l] for record in results_1]
-		etl_cur.executemany(sql_2, values)
-		etl.commit()
+	for result in results:
+		for i in range(1, 12):
+			# comp_full_name = [result['comp_full_name'] for result in results]
+			# so = str(tuple(comp_full_name))
+			short = result['comp_full_name']
+			full_name = [short+houzhui for houzhui in [', INC.', ' Co.,Ltd.', ' Corp.', ',LLC.']]
+			sql_1 = """select * from patent_{0} WHERE applicantName in {1}""".format(str(i), str(tuple(full_name)))
+			etl_cur.execute(sql_1)
+			result_1 = etl_cur.fetchall()  # 这里是一条结果了
+			m += 1
+			print(m)
+			sql_2 = """insert into zhuanli_patent_wai_che (pid,appNumber,pubNumber,appDate,pubDate,title,ipc,applicantName,app_short,inventroName,family,agencyName,agentName,addrProvince,addrCity,addrCounty,address,patType,abs,lprs,draws,dbName,tifDistributePath,pages,proCode,appCoun,gazettePath,gazettePage,gazetteCount,statusCode,familyNo,legalStatus,mainIpc,appResource,cl,patentWords,page) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+			l = ['pid', 'appNumber', 'pubNumber', 'appDate', 'pubDate', 'title', 'ipc', 'applicantName', 'app_short', 'inventroName',
+			     'family', 'agencyName', 'agentName', 'addrProvince', 'addrCity', 'addrCounty', 'address', 'patType',
+			     'abs', 'lprs', 'draws', 'dbName', 'tifDistributePath', 'pages', 'proCode', 'appCoun', 'gazettePath',
+			     'gazettePage', 'gazetteCount', 'statusCode', 'familyNo', 'legalStatus', 'mainIpc', 'appResource', 'cl',
+			     'patentWords', 'page']
+			result_1['app_short'] = short
+			values = [result_1[i] for i in l]
+			etl_cur.execute(sql_2, values)
+			etl.commit()
 except:
 	traceback.print_exc()
 finally:
 	etl.close()
+
+
+
 
 # try:
 # 	sql = """select comp_full_name from zhuanli_wai_comp"""
