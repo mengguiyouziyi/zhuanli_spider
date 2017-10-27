@@ -30,9 +30,9 @@ try:
 	m = 0
 	for result in results:
 		for i in range(1, 12):
-			sql_1 = """select * from patent_{0} WHERE applicantName LIKE {1}""".format(str(i), (
+			sql_1 = """select * from patent_{0} WHERE applicantName LIKE '{1}'""".format(str(i), (
 			'%' + result['comp_full_name'] + '%'))
-			print(sql_1)
+			# print(sql_1)
 			etl_cur.execute(sql_1)
 			results_1 = etl_cur.fetchall()
 			m += len(results_1)
