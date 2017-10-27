@@ -13,7 +13,7 @@ a020 = '10.44.152.49'
 a024 = '10.44.51.90'
 
 
-etl_config = {'host': 'etl1.innotree.org',
+etl_config = {'host': 'etl2.innotree.org',
               'port': 3308,
               'user': 'spider',
               'password': 'spider',

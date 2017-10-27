@@ -29,26 +29,37 @@ try:
 
 	m = 0
 	for result in results:
-		for i in range(1, 12):
-			# comp_full_name = [result['comp_full_name'] for result in results]
-			# so = str(tuple(comp_full_name))
-			short = result['comp_full_name']
-			full_name = [short+houzhui for houzhui in [', INC.', ' Co.,Ltd.', ' Corp.', ',LLC.']]
-			sql_1 = """select * from patent_{0} WHERE applicantName in {1}""".format(str(i), str(tuple(full_name)))
-			etl_cur.execute(sql_1)
-			result_1 = etl_cur.fetchall()  # 这里是一条结果了
-			m += 1
-			print(m)
-			sql_2 = """insert into zhuanli_patent_wai_che (pid,appNumber,pubNumber,appDate,pubDate,title,ipc,applicantName,app_short,inventroName,family,agencyName,agentName,addrProvince,addrCity,addrCounty,address,patType,abs,lprs,draws,dbName,tifDistributePath,pages,proCode,appCoun,gazettePath,gazettePage,gazetteCount,statusCode,familyNo,legalStatus,mainIpc,appResource,cl,patentWords,page) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-			l = ['pid', 'appNumber', 'pubNumber', 'appDate', 'pubDate', 'title', 'ipc', 'applicantName', 'app_short', 'inventroName',
-			     'family', 'agencyName', 'agentName', 'addrProvince', 'addrCity', 'addrCounty', 'address', 'patType',
-			     'abs', 'lprs', 'draws', 'dbName', 'tifDistributePath', 'pages', 'proCode', 'appCoun', 'gazettePath',
-			     'gazettePage', 'gazetteCount', 'statusCode', 'familyNo', 'legalStatus', 'mainIpc', 'appResource', 'cl',
-			     'patentWords', 'page']
-			result_1['app_short'] = short
-			values = [result_1[i] for i in l]
-			etl_cur.execute(sql_2, values)
-			etl.commit()
+		# print(result)
+		# for i in range(1, 12):
+		# comp_full_name = [result['comp_full_name'] for result in results]
+		# so = str(tuple(comp_full_name))
+		short = result['comp_full_name']
+
+		full_name = [short+houzhui for houzhui in [', INC.', ',INC.', ' Co.,Ltd.', ' Co., Ltd.', ' Corp.', ',LLC.', ' ,LLC.']]
+		# print(full_name[0])
+		so = str(tuple(full_name))
+		sql_1 = """select * from patent WHERE applicantName in {}""".format(so)
+		# print(sql_1)
+		etl_cur.execute(sql_1)
+		result_1 = etl_cur.fetchall()  # 这里是一条结果了
+		if not result_1:
+			continue
+		# print(result_1)
+
+		sql_2 = """insert into zhuanli_patent_wai_che (pid,appNumber,pubNumber,appDate,pubDate,title,ipc,applicantName,app_short,inventroName,family,agencyName,agentName,addrProvince,addrCity,addrCounty,address,patType,abs,lprs,draws,dbName,tifDistributePath,pages,proCode,appCoun,gazettePath,gazettePage,gazetteCount,statusCode,familyNo,legalStatus,mainIpc,appResource,cl,patentWords,page) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+		l = ['pid', 'appNumber', 'pubNumber', 'appDate', 'pubDate', 'title', 'ipc', 'applicantName', 'app_short', 'inventroName',
+		     'family', 'agencyName', 'agentName', 'addrProvince', 'addrCity', 'addrCounty', 'address', 'patType',
+		     'abs', 'lprs', 'draws', 'dbName', 'tifDistributePath', 'pages', 'proCode', 'appCoun', 'gazettePath',
+		     'gazettePage', 'gazetteCount', 'statusCode', 'familyNo', 'legalStatus', 'mainIpc', 'appResource', 'cl',
+		     'patentWords', 'page']
+		for r in result_1:
+			for j in range(len(result_1)):
+				result_1[j]['app_short'] = short
+				values = [result_1[j][i] for i in l]
+				etl_cur.execute(sql_2, values)
+				etl.commit()
+				m += 1
+				print(m)
 except:
 	traceback.print_exc()
 finally:

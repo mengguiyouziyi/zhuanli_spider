@@ -32,7 +32,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp where comp_full_name in (select comp_full_name from zhuanli_xiongan_comp where change_gai != '删除')"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp where comp_full_name in (select comp_full_name from zhuanli_xiongan_comp)"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
