@@ -32,7 +32,7 @@ def get_comp(connect):
 	:return:
 	"""
 	cur = connect.cursor()
-	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp WHERE only_id in (select only_id from zhuanli_wai_comp)"""
 	cur.execute(sql)
 	results = cur.fetchall()
 	return results
@@ -75,11 +75,11 @@ def in_zhuanli(insert_con, tab, args_list):
 	:param args_list:
 	:return:
 	"""
-	l_num_str = args_list[0][1][-1]
-	columns_a = _get_column(insert_con, tab + '_' + l_num_str)
+	# l_num_str = args_list[0][1][-1]
+	columns_a = _get_column(insert_con, tab)
 	col_num = len(columns_a.split(','))
 	columns = columns_a
-	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab + '_' + l_num_str, columns=columns,
+	insert_sql = """insert into {tab} ({columns}) VALUES ({val})""".format(tab=tab, columns=columns,
 	                                                                       val=_handle_str(col_num))
 	insert_cur = insert_con.cursor()
 	# 确保入库的时候都在50条以下
@@ -221,7 +221,7 @@ def main():
 			(total, values) = response
 			add_list = [id, only_id, proposer, total]
 			values = get_values(values, add_list)
-			in_zhuanli(connect, 'zhuanli_info_all', values)
+			in_zhuanli(connect, 'zhuanli_info_wai', values)
 			print(id, '~~success~~', 1)
 		except:
 			print(id, '~~unknow error~~', 1)

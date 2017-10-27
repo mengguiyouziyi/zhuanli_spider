@@ -40,10 +40,10 @@ def read_xml_gen(xml_path):
 	sheet = book.sheet_by_index(0)
 	rows = sheet.nrows
 	print(rows)
-	for row in range(1, rows+1):
+	for row in range(1, rows + 1):
 		vals = sheet.row_values(row)  # list，含有一列的所有信息
-		only_id = gen_id(vals[1])
-		vals.insert(1, only_id)
+		# only_id = gen_id(vals[1])
+		# vals.insert(1, only_id)
 		yield vals
 
 
@@ -83,19 +83,16 @@ def in_comp(connect, vals):
 	:return:
 	"""
 	cur = connect.cursor()
-	# sql = """insert into zhuanli_shenqing_comp (comp_full_name, only_id, IMGTITLE, lssc, abso, tie, vu, absc, tio, abse, inc, pdfexist, agc, ape, apc, IMGNAME, ano, tic, ans, apo, ino, pns, pdt, ine, pid, pno, IMGO, pd, ipc, ad, ago, sfpns, pk) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-	sql = """insert into zhuanli_shenqing_comp (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-	vl_list = [val[1:8] for val in vals]
+	# sql = """insert into zhuanli_wai_comp (only_id, comp_full_name, hangye, zihangye, guoji, diqu, shengqingliang) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+	# vl_list = [val[1:8] for val in vals]
+	sql = """insert into zhuanli_wai_comp (comp_full_name) VALUES (%s)"""
+	vl_list = [val[0:1] for val in vals]
 	cur.executemany(sql, vl_list)
 	connect.commit()
 
 
-if __name__ == '__main__':
-	# val_all = read_xml('申请人名单大全1.xlsx')
-	val_all = read_xml_gen('hou1.xlsx')
-	# print(val_all)
-	# for a in val_all:
-	# 	print(a)
+def main():
+	val_all = read_xml_gen('/Users/menggui/Desktop/project/zhuanli_spider/use/科技金融-国外（来源36kr）.xlsx')
 	config = {'host': 'etl2.innotree.org',
 	          'port': 3308,
 	          'user': 'spider',
@@ -107,7 +104,7 @@ if __name__ == '__main__':
 	try:
 		x = []
 		for i, v in enumerate(val_all):
-			print(i+900000)
+			print(i)
 			x.append(v)
 			if len(x) == 1:
 				in_comp(connect, x)
@@ -119,3 +116,7 @@ if __name__ == '__main__':
 		traceback.print_exc()
 	finally:
 		connect.close()
+
+
+if __name__ == '__main__':
+	main()
