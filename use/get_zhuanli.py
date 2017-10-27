@@ -3,8 +3,8 @@ import time
 import pymysql
 import math
 import json
-import logging
-from urllib.parse import quote_plus
+# import logging
+# from urllib.parse import quote_plus
 from traceback import print_exc
 from more_itertools import chunked
 from collections import OrderedDict
@@ -111,17 +111,20 @@ def get_res(token, result, page):
 	               "page": "%s" % page, "page_row": "100"}
 	api_url = "http://114.251.8.193/api/patent/search/expression"
 	try:
-		response = requests.request("GET", api_url, params=querystring, timeout=10)
+		info = requests.request("GET", api_url, params=querystring, timeout=15).json()
+		time.sleep(1)
 	except:
 		print(id, '~~timeout error~~', page)
 		return
-	time.sleep(1)
-	info = json.loads(response.text)
+	if not info:
+		print(id, '~~no info~~', page)
+		return
+	# info = json.loads(response.text)
 	errorCode = info.get('errorCode')
 	context = info.get('context')
 	if not errorCode:
 		print(id, '~~no errorCode~~', page)
-		print(response.text.strip())
+		print(info.strip())
 		return -1
 	if errorCode == '000016':
 		# 查询错误，最多只能返回查询条件前10000条数据
@@ -151,7 +154,7 @@ def get_res(token, result, page):
 		return (total, values)
 	else:
 		print(id, '~~other error~~', page)
-		print(response.text.strip())
+		print(info.strip())
 		return
 
 
@@ -204,25 +207,24 @@ def main():
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		# if id <= 642 and id not in [12, 50, 54, 113, 114, 135, 141, 153, 160, 188, 200, 216, 259, 360, 383, 394, 398,
-		#                             476, 479, 482, 486, 499, 544, 545, 564, 572, 577, 590, 604, 635]:
-		# 	continue
-		# 使用token获取结果, 注意使用的是循环外的token
-		response = get_res(token, result, 1)
-		if response == -1:
-			# 如果token失效，重新获取token，下次循环的时候token也是这个新token
-			token = get_token()
-			response = get_res(token, result, 1)
-		if not response:
+		if id <= 934 and id not in [604, 783]:
 			continue
-		(total, values) = response
-		add_list = [id, only_id, proposer, total]
-		values = get_values(values, add_list)
+		# 使用token获取结果, 注意使用的是循环外的token
 		try:
+			response = get_res(token, result, 1)
+			if response == -1:
+				# 如果token失效，重新获取token，下次循环的时候token也是这个新token
+				token = get_token()
+				response = get_res(token, result, 1)
+			if not response:
+				continue
+			(total, values) = response
+			add_list = [id, only_id, proposer, total]
+			values = get_values(values, add_list)
 			in_zhuanli(connect, 'zhuanli_info_all', values)
 			print(id, '~~success~~', 1)
 		except:
-			print(id, '~~insert error~~', 1)
+			print(id, '~~unknow error~~', 1)
 			print_exc()
 			continue
 
