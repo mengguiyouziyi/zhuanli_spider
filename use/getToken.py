@@ -71,7 +71,16 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	browser.maximize_window()
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
 	time.sleep(0.5)
-	browser.find_element_by_id('resource_获取token').find_element_by_class_name('expandResource').click()
+
+
+	browser.find_element_by_id('resource_获取token').find_element_by_class_name('collapseResource').click()
+	time.sleep(0.5)
+	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	time.sleep(0.5)
+	browser.find_element_by_id('resource_获取token').find_element_by_class_name(
+		'http_method').find_element_by_tag_name('a').click()
+	time.sleep(0.5)
+	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
 	time.sleep(0.5)
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
 	time.sleep(0.5)
