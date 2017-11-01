@@ -27,7 +27,7 @@ def get_token(path='/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'):
 	browser.maximize_window()
 	# browser.set_window_position(20, 40)
 	# browser.set_window_size(3000, 3000)
-	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	# browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
 	time.sleep(0.5)
 	# with open('x.html', 'a') as f:
 	# 	f.write(browser.page_source)
