@@ -35,7 +35,7 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	# print(browser.get_window_size())
 	# print(browser.page_source)
 	m = browser.find_element_by_id('resource_获取Authorization_Code')
-	print(m)
+	print(m.text)
 	browser.find_element_by_id('resource_获取Authorization_Code').find_element_by_class_name('expandResource').click()
 	time.sleep(0.5)
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
