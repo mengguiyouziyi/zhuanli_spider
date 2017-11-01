@@ -193,8 +193,8 @@ def get_values(values, add_list):
 
 
 def main():
-	config = {'host': 'etl1.innotree.org',
-	          'port': 3308,
+	config = {'host': '172.31.215.38',
+	          'port': 3306,
 	          'user': 'spider',
 	          'password': 'spider',
 	          'db': 'spider',
@@ -208,9 +208,12 @@ def main():
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		# if id <= 934 and id not in [604, 783]:
-		# 	continue
-		# 使用token获取结果, 注意使用的是循环外的token
+		# 7380
+		# timeout:1889 2233 2595 2967 3400 3531 5632 7130 7358
+		# unknowerror:1083
+		# Syntax error:3492 4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
+		if id > 1:
+			continue
 		try:
 			response = get_res(token, result, 1)
 			if response == -1:

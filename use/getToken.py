@@ -4,7 +4,7 @@ from selenium import webdriver
 from scrapy import Selector
 
 
-def get_token(path='/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'):
+def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	"""
 	获取access_token
 	:return:
@@ -17,6 +17,7 @@ def get_token(path='/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'):
 	browser.find_element_by_id('username').send_keys('yinguoshu')
 	browser.find_element_by_id('password1').send_keys('yinguoshu')
 	browser.find_element_by_id('submitButton').click()
+
 	browser.get('http://114.251.8.193/web/api/oauth/authorization.jsp')
 	time.sleep(0.5)
 	browser.maximize_window()
