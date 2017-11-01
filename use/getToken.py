@@ -5,14 +5,14 @@ from scrapy import Selector
 
 
 # def get_token(path='/data1/spider/java_spider/phantomjs-2.1.1-linux-x86_64/bin/phantomjs1'):
-# def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
-def get_token(path='/home/spider/.pyenv/versions/3.5.2/bin/phantomjs'):
+def get_token(path='/root/.pyenv/versions/3.5.4/bin/geckodriver'):
+# def get_token(path='/home/spider/.pyenv/versions/3.5.2/bin/phantomjs'):
 	"""
 	path='/root/.pyenv/versions/3.5.4/bin/phantomjs'
 	获取access_token
 	:return:
 	"""
-	browser = webdriver.PhantomJS(executable_path=path)
+	browser = webdriver.Firefox(executable_path=path)
 	# browser = webdriver.PhantomJS()
 	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 	denglu = 'http://114.251.8.193/login.jsp'
