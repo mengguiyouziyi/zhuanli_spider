@@ -4,12 +4,14 @@ from selenium import webdriver
 from scrapy import Selector
 
 
-def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
+def get_token():
 	"""
+	path='/root/.pyenv/versions/3.5.4/bin/phantomjs'
 	获取access_token
 	:return:
 	"""
-	browser = webdriver.PhantomJS(executable_path=path)
+	# browser = webdriver.PhantomJS(executable_path=path)
+	browser = webdriver.PhantomJS()
 	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 	denglu = 'http://114.251.8.193/login.jsp'
 	browser.get(denglu)
@@ -22,7 +24,7 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	time.sleep(0.5)
 	browser.maximize_window()
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
-	time.sleep(1)
+	time.sleep(0.5)
 	browser.find_element_by_class_name('expandResource').click()
 	time.sleep(0.5)
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
