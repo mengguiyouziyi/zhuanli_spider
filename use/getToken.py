@@ -15,7 +15,7 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	# browser = webdriver.PhantomJS(executable_path=path)
 	# browser = webdriver.PhantomJS()
 	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
-	browser = webdriver.Chrome(executable_path='/home/spider/.pyenv/versions/3.5.2/bin/chromedriver')
+	browser = webdriver.Chrome(executable_path='/root/.pyenv/versions/3.5.4/bin/chromedriver')
 	denglu = 'http://114.251.8.193/login.jsp'
 	browser.get(denglu)
 	time.sleep(0.5)
