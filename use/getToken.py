@@ -24,8 +24,8 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	browser.get('http://114.251.8.193/web/api/oauth/authorization.jsp')
 	time.sleep(0.5)
 	browser.maximize_window()
-	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
-	time.sleep(0.5)
+	# browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
+	# time.sleep(0.5)
 	browser.find_element_by_class_name('expandResource').click()
 	time.sleep(0.5)
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
@@ -82,7 +82,7 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 
 
 if __name__ == '__main__':
-	# phan_mac_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
-	phan_linux_path = '/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'
-	token = get_token(phan_linux_path)
+	# phan_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
+	# phan_path = '/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'
+	token = get_token()
 	print(token)
