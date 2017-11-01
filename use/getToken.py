@@ -4,14 +4,14 @@ from selenium import webdriver
 from scrapy import Selector
 
 
-def get_token():
+def get_token(path='/data1/spider/java_spider/phantomjs-2.1.1-linux-x86_64/bin/phantomjs1'):
 	"""
 	path='/root/.pyenv/versions/3.5.4/bin/phantomjs'
 	获取access_token
 	:return:
 	"""
-	# browser = webdriver.PhantomJS(executable_path=path)
-	browser = webdriver.PhantomJS()
+	browser = webdriver.PhantomJS(executable_path=path)
+	# browser = webdriver.PhantomJS()
 	# browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 	denglu = 'http://114.251.8.193/login.jsp'
 	browser.get(denglu)
