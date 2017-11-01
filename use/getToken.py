@@ -25,7 +25,7 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	time.sleep(0.5)
 	# browser.maximize_window()
 	browser.set_window_position(20, 40)
-	browser.set_window_size(1100, 1000)
+	browser.set_window_size(3000, 3000)
 	# browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
 	# time.sleep(0.5)
 	browser.find_element_by_class_name('expandResource').click()
