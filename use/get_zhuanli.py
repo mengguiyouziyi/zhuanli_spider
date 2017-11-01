@@ -232,6 +232,13 @@ def main():
 			traceback.print_exc()
 			continue
 
+if __name__ == '__main__':
+	# access_token = get_token()
+	# print(access_token)
+	# get_api(access_token)
+	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
+	main()
+
 
 # def main():
 # 	# 获取公司列表
@@ -294,12 +301,7 @@ def main():
 
 
 
-if __name__ == '__main__':
-	# access_token = get_token()
-	# print(access_token)
-	# get_api(access_token)
-	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
-	main()
+
 
 """各种错误
 {^M

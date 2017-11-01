@@ -79,7 +79,7 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 
 
 if __name__ == '__main__':
-	phan_mac_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
+	# phan_mac_path = '/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs'
 	# phan_linux_path = '/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'
-	token = get_token(phan_mac_path)
+	token = get_token()
 	print(token)
