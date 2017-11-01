@@ -6,7 +6,7 @@ from scrapy import Selector
 
 # def get_token(path='/data1/spider/java_spider/phantomjs-2.1.1-linux-x86_64/bin/phantomjs1'):
 def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
-# def get_token(path='/home/spider/.pyenv/versions/3.5.2/bin/phantomjs'):
+	# def get_token(path='/home/spider/.pyenv/versions/3.5.2/bin/phantomjs'):
 	"""
 	path='/root/.pyenv/versions/3.5.4/bin/phantomjs'
 	获取access_token
@@ -34,6 +34,8 @@ def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	# 	f.write(browser.page_source)
 	# print(browser.get_window_size())
 	# print(browser.page_source)
+	m = browser.find_element_by_id('resource_获取Authorization_Code')
+	print(m)
 	browser.find_element_by_id('resource_获取Authorization_Code').find_element_by_class_name('expandResource').click()
 	time.sleep(0.5)
 	browser.execute_script("window.scrollTo(document.body.scrollWidth, document.body.scrollHeight)")
