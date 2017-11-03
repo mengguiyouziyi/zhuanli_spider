@@ -76,6 +76,7 @@ def in_zhuanli(insert_con, tab, args_list):
 	:param args_list:
 	:return:
 	"""
+	# l_num_str = args_list[0][1][-2:]
 	l_num_str = args_list[0][1][-1]
 	columns_a = _get_column(insert_con, tab + '_' + l_num_str)
 	col_num = len(columns_a.split(','))
@@ -209,10 +210,10 @@ def main():
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
 		# 7380
-		# timeout:1889 2233 2595 2967 3400 3531 5632 7130 7358
+		# timeout:1889,2233,2595,2967,3400,3531,5632,7130,7358
 		# unknowerror:1083
-		# Syntax error:3492 4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
-		if id > 1:
+		# Syntax error:3492,4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
+		if id <= 7380 and id not in [1889, 2233, 2595, 2967, 3400, 3531, 5632, 7130, 7358, 1803, 3492, 4729]:
 			continue
 		try:
 			response = get_res(token, result, 1)
@@ -232,13 +233,13 @@ def main():
 			traceback.print_exc()
 			continue
 
+
 if __name__ == '__main__':
 	# access_token = get_token()
 	# print(access_token)
 	# get_api(access_token)
 	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
 	main()
-
 
 # def main():
 # 	# 获取公司列表
