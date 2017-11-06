@@ -2,13 +2,17 @@ import requests
 import time
 import pymysql
 import math
+import sys
 # import json
 # import logging
 # from urllib.parse import quote_plus
 import traceback
+from datetime import datetime
 from more_itertools import chunked
 from collections import OrderedDict
+from pymysql.connections import err
 from getToken import get_token
+
 
 
 # # 创建一个logger
@@ -116,25 +120,25 @@ def get_res(token, result, page):
 		info = requests.request("GET", api_url, params=querystring, timeout=15).json()
 		time.sleep(1)
 	except:
-		print(id, '~~timeout error~~', page)
+		print(id, '~~timeout error~~', page, datetime.now())
 		return
 	if not info:
-		print(id, '~~no info~~', page)
+		print(id, '~~no info~~', page, datetime.now())
 		return
 	# info = json.loads(response.text)
 	errorCode = info.get('errorCode')
 	context = info.get('context')
 	if not errorCode:
-		print(id, '~~no errorCode~~', page)
+		print(id, '~~no errorCode~~', page, datetime.now())
 		print(info.strip())
 		return -1
 	if errorCode == '000016':
 		# 查询错误，最多只能返回查询条件前10000条数据
-		print(id, '~~code:000016 Query error, only return the first 10000~~', page)
+		print(id, '~~code:000016 Query error, only return the first 10000~~', page, datetime.now())
 		return
 	elif errorCode == "表达式语法错误":
 		# 存在语法错误，请重新编辑表达式后进行检索
-		print(id, '~~Syntax error~~', page)
+		print(id, '~~Syntax error~~', page, datetime.now())
 		print(querystring)
 		return
 	elif errorCode == '000003':
@@ -142,9 +146,11 @@ def get_res(token, result, page):
 		print(id, '~~code:000003 Connecting data query base exceptions~~', page)
 		return
 	elif not context:
-		print(id, '~~no context~~', page)
-		return
-	elif errorCode == '000000' and context:
+		# 说明接口调用超过限制
+		print(id, '~~no context~~', page, datetime.now())
+		print('program over...')
+		sys.exit(1)
+	elif errorCode == '000000':
 		total = info.get('total')
 		records = context.get('records')
 		records = get_update_dicts(records)
@@ -155,7 +161,7 @@ def get_res(token, result, page):
 		values = [[record[i] for i in key_list] for record in records]
 		return (total, values)
 	else:
-		print(id, '~~other error~~', page)
+		print(id, '~~other error~~', page, datetime.now())
 		print(info.strip())
 		return
 
@@ -213,25 +219,31 @@ def main():
 		# timeout:1889,2233,2595,2967,3400,3531,5632,7130,7358
 		# unknowerror:1083
 		# Syntax error:3492,4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
-		if id <= 7380 and id not in [1889, 2233, 2595, 2967, 3400, 3531, 5632, 7130, 7358, 1803, 3492, 4729]:
+		# 51731～～～～44398 行
+		if id <= 51731:
 			continue
-		try:
+		response = get_res(token, result, 1)
+		if response == -1:
+			# 如果token失效，重新获取token，下次循环的时候token也是这个新token
+			token = get_token()
 			response = get_res(token, result, 1)
-			if response == -1:
-				# 如果token失效，重新获取token，下次循环的时候token也是这个新token
-				token = get_token()
-				response = get_res(token, result, 1)
-			if not response:
-				continue
-			(total, values) = response
-			add_list = [id, only_id, proposer, total]
-			values = get_values(values, add_list)
-			in_zhuanli(connect, 'zhuanli_info_all', values)
-			print(id, '~~success~~', 1)
-		except:
-			print(id, '~~unknow error~~', 1)
-			traceback.print_exc()
+		if not response:
 			continue
+		(total, values) = response
+		add_list = [id, only_id, proposer, total]
+		values = get_values(values, add_list)
+		try:
+			in_zhuanli(connect, 'zhuanli_info_all', values)
+			print(id, '~~success~~', 1, datetime.now())
+		except err.InterfaceError:
+			print(id, '~~mysql no connection~', 1, datetime.now())
+			print('program over...')
+			sys.exit(1)
+		except Exception as e:
+			print(id, '~~unknow error~~', 1, datetime.now())
+			print(e)
+			print('program over...')
+			sys.exit(1)
 
 
 if __name__ == '__main__':
@@ -240,6 +252,9 @@ if __name__ == '__main__':
 	# get_api(access_token)
 	# get_api('23d4daa7-29f9-4ebb-baa0-5d5d5d0c51ab')
 	main()
+
+
+
 
 # def main():
 # 	# 获取公司列表
