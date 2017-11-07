@@ -130,7 +130,7 @@ def get_res(token, result, page):
 	context = info.get('context')
 	if not errorCode:
 		print(id, '~~no errorCode~~', page, datetime.now())
-		print(info.strip())
+		print(info)
 		return -1
 	if errorCode == '000016':
 		# 查询错误，最多只能返回查询条件前10000条数据
@@ -149,7 +149,7 @@ def get_res(token, result, page):
 		# 说明接口调用超过限制
 		# 有别的可能
 		print(id, '~~no context~~', page, datetime.now())
-		print(info.strip())
+		print(info)
 		print('program over...')
 		sys.exit(1)
 	elif errorCode == '000000':
