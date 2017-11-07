@@ -145,6 +145,12 @@ def get_res(token, result, page):
 		# 连接数据查询库异常
 		print(id, '~~code:000003 Connecting data query base exceptions~~', page)
 		return
+	elif not context and errorCode == '000000':
+		# 说明接口调用超过限制
+		# 有别的可能
+		print(id, '~~no context but 000000~~', page, datetime.now())
+		print(info)
+		return
 	elif not context:
 		# 说明接口调用超过限制
 		# 有别的可能
