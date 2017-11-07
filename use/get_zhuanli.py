@@ -118,7 +118,7 @@ def get_res(token, result, page):
 	api_url = "http://114.251.8.193/api/patent/search/expression"
 	try:
 		info = requests.request("GET", api_url, params=querystring, timeout=15).json()
-		time.sleep(1)
+		time.sleep(0.6)
 	except:
 		print(id, '~~timeout error~~', page, datetime.now())
 		return
