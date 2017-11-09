@@ -225,7 +225,7 @@ def main():
 		# unknowerror:1083
 		# Syntax error:3492,4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
 		# 51731～～～～44398 行
-		if id < 130175:
+		if id < 136571:
 			continue
 		response = get_res(token, result, 1)
 		if response == -1:
@@ -325,6 +325,9 @@ if __name__ == '__main__':
 
 
 """各种错误
+
+(1366, "Incorrect string value: '\\xF2\\xB5\\xB0\\xB0\\xD7\\xBB...' for column 'abso' at row 14")
+
 {'context': None, 'errorDesc': '错误代码[9999] ==> 超出接口调用次数限制', 'errorCode': '9999'}
 {^M
 338 "errorCode" : "000016",^M
