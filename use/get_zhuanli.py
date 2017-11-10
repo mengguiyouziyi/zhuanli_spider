@@ -225,7 +225,7 @@ def main():
 		# unknowerror:1083
 		# Syntax error:3492,4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
 		# 51731～～～～44398 行
-		if id < 136571:
+		if id < 170182:
 			continue
 		response = get_res(token, result, 1)
 		if response == -1:
