@@ -210,7 +210,7 @@ def main():
 	          'user': 'spider',
 	          'password': 'spider',
 	          'db': 'spider',
-	          'charset': 'utf8',
+	          'charset': 'utf8mb4',
 	          'cursorclass': pymysql.cursors.DictCursor}
 	connect = pymysql.connect(**config)
 	results = get_comp(connect)
@@ -225,7 +225,7 @@ def main():
 		# unknowerror:1083
 		# Syntax error:3492,4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
 		# 51731～～～～44398 行
-		if id < 170182:
+		if id < 200974:
 			continue
 		response = get_res(token, result, 1)
 		if response == -1:
@@ -245,10 +245,14 @@ def main():
 			print('program over...')
 			sys.exit(1)
 		except Exception as e:
-			print(id, '~~unknow error~~', 1, datetime.now())
-			print(e)
-			print('program over...')
-			sys.exit(1)
+
+			if '1366, "Incorrect string value' in e.__str__():
+				print(id, '~~Incorrect string value~~', 1, datetime.now())
+			else:
+				print(id, '~~unknow error~~', 1, datetime.now())
+				print(e)
+				print('program over...')
+				sys.exit(1)
 
 
 if __name__ == '__main__':
