@@ -111,8 +111,9 @@ def main(*args):
 	         "纳米摩擦电缆", "纳米传感带", "纳米自发电鞋", "纳米发电鞋", "压电传感器", "生理监测传感带", "生理信号采集传感带", "纳米自发电鞋",
 	         "自发光鞋", "智能计步鞋", "追踪鞋", "智能看护鞋", "足部理疗鞋", "自发电防伪", "高端酒防伪", "化妆品防伪", "物流防伪", "药品防伪", "纳米防伪", "微纳传感器",
 	         "微型能量收集", "石墨烯微型超级电容器", "石墨烯超级电容器", "石墨烯微型电容器", "石墨烯电容器", "压电传感电缆", "压电传感电缆", "纳米氧化锌", "紫外线传感器",
-	         "硅基紫外线传感器", "气流传感器", "气动传感（器）", "电子烟传感器", "雾化器传感器", "通用雾化器传感器", "医用雾化器传感器", "气体检测传感器", "智能睡眠传感器",
+	         "硅基紫外线传感器", "气流传感器", "气动传感（器）", "气动传感(器)", "电子烟传感器", "雾化器传感器", "通用雾化器传感器", "医用雾化器传感器", "气体检测传感器", "智能睡眠传感器",
 	         "智能枕头传感器", "居家养老监护器", "智能床垫传感器", "智能坐垫传感器"]
+	comp_names = ['国家纳米科学中心', '纳米新能源（唐山）有限责任公司', '北京纳米能源与系统研究所', '纳米新能源(唐山)有限责任公司']
 	columns_list = args[0].split(',')
 	num = len(columns_list)
 	start = i = 0
@@ -124,27 +125,34 @@ def main(*args):
 			# continue
 			return
 		start += len(results)
-		# value_list = []
 		for result in results:
 			i += 1
 			title = result['title']
 			abs = result['abs']
 			appcoun = result['appcoun']
 			pubnumber = result['pubnumber']
+			applicantname = result['applicantname']
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
-			if appcoun != 'CN' or title.replace(' ', '').isalpha():
+			# or title.replace(' ', '').isalpha()
+			if appcoun != 'CN':
+				continue
+			if applicantname in comp_names:
 				continue
 			print(i)
 			# print(i, pubnumber, 'unknow', title)
-			som = title + ' ' + abs
 			is_have = False
 			for w in words:
-				if w not in som:
-					# print(i, 'not in', title)
-					continue
+				if w not in title:
+					if w not in abs:
+						continue
+					else:
+						# 没在title里，但是在abs里
+						result['appcoun'] = w
+						is_have = True
 				else:
 					result['appcoun'] = w
 					is_have = True
+			som = title + ' ' + abs
 			if '可自发电' in som and '纳米' in som:
 				result['appcoun'] = '可自发电+纳米'
 				is_have = True
@@ -160,15 +168,6 @@ def main(*args):
 			# 	continue
 			values = [result[columns_list[i].strip()] for i in range(num)]
 			insertManyFun(args[3], args[4], values)
-		# print(i, pubnumber, 'seccess', title)
-
-		# 	value_list.append(values)
-		# 	if len(value_list) == 5:
-		# 		insertManyFun(args[3], args[4], value_list)
-		# 		value_list.clear()
-		# 	else:
-		# 		continue
-		# insertManyFun(args[3], args[4], value_list)
 
 
 if __name__ == '__main__':

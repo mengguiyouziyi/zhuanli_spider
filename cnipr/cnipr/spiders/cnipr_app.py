@@ -31,7 +31,7 @@ class TouzishijianSpider(scrapy.Spider):
 	def start_requests(self):
 		login_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/login!goonlogin.action?rd=0.3424056342857026'
 		payload = {'username': 'wlglzx', 'password': '!QAZ2wsx'}
-		return [scrapy.FormRequest(login_url, formdata=payload, callback=self.check_login)]
+		yield scrapy.Request(login_url, method='POST', body=payload, callback=self.check_login)
 
 	def check_login(self, response):
 		comp_name = '江苏远东电机制造有限公司'

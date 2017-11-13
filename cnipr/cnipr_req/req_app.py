@@ -84,7 +84,6 @@ def get_detail():
 	}
 	response = requests.get(detail_url, headers=headers)
 	print(response.text)
-
 	with open('detail.html', 'a') as f:
 		f.writelines(response.text)
 
