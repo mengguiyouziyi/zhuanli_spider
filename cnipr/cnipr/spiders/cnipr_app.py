@@ -29,9 +29,10 @@ class TouzishijianSpider(scrapy.Spider):
 	# cookie_dict = dict((line.split('=') for line in choice(cookies).strip().split(";")))
 
 	def start_requests(self):
-		login_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/login!goonlogin.action?rd=0.3424056342857026'
+		# login_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/login!goonlogin.action?rd=0.3424056342857026'
+		login_url = "http://search.cnipr.com/login.action?rd=0.3424056342857026"
 		payload = {'username': 'wlglzx', 'password': '!QAZ2wsx'}
-		yield scrapy.Request(login_url, method='POST', body=payload, callback=self.check_login)
+		return [scrapy.FormRequest(login_url, formdata=payload, callback=self.check_login)]
 
 	def check_login(self, response):
 		comp_name = '江苏远东电机制造有限公司'
