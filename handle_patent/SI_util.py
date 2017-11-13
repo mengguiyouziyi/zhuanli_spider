@@ -60,7 +60,7 @@ def insertManyFun(tab, columns, args_list):
 	col_num = len(columns.split(', '))
 	insert_sql = """insert into {tab} {columns} VALUES {val}""".format(tab=tab, columns=columns,
 	                                                                   val=_handle_str(col_num))
-	print(insert_sql)
+	# print(insert_sql)
 	insert_con, insert_cur = _sqlObj('spider')
 	try:
 		insert_cur.execute(insert_sql, args_list)
@@ -117,6 +117,7 @@ def main(*args):
 	num = len(columns_list)
 	start = i = 0
 	while True:
+		print('start', start)
 		results = selectFun(args[0], args[1], start, 500000, db=args[2])
 		if not results:
 			# time.sleep(600)
@@ -148,7 +149,7 @@ def main(*args):
 				is_have = True
 			if not is_have:
 				continue
-			# print(i, pubnumber, 'have', title)
+			print(i, pubnumber, 'have', title)
 			# # 去空
 			# n = 0
 			# for val in result.values():
@@ -158,7 +159,7 @@ def main(*args):
 			# 	continue
 			values = [result[columns_list[i].strip()] for i in range(num)]
 			insertManyFun(args[3], args[4], values)
-			print(i, pubnumber, 'seccess', title)
+		# print(i, pubnumber, 'seccess', title)
 
 		# 	value_list.append(values)
 		# 	if len(value_list) == 5:
