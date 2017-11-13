@@ -5,6 +5,16 @@ from urllib.parse import quote_plus
 class CniprRequest(object):
 	def __init__(self):
 		self.session = requests.session()
+		proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
+			"host": "http-dyn.abuyun.com",
+			"port": "9020",
+			"user": "HJ3F19379O94DO9D",
+			"pass": "D1766F5002A70BC4",
+		}
+		self.proxies = {
+			"http": proxyMeta,
+			"https": proxyMeta,
+		}
 		self.id = self.login()
 
 	def login(self):
@@ -21,34 +31,34 @@ class CniprRequest(object):
 		}
 		login_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/login!goonlogin.action?rd=0.3424056342857026'
 		payload = {'username': 'wlglzx', 'password': '!QAZ2wsx'}
-		response = self.session.request("POST", login_url, headers=headers, data=payload)
+		response = self.session.request("POST", login_url, headers=headers, data=payload, proxies=self.proxies)
 		print(response.text)
 		print(response.cookies.items())
 		return response.cookies.items()[0][1]
 
-	def get_list_all_other(self):
-		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=AtTrial'
-		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=inValid'
-		headers = {
-			'Host': 'm.cnipr.com:8081',
-			'Accept': '*/*',
-			'Cookie': 'TailorID=3208de0a93dfd94e069897797de339da92c4',
-			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432',
-			'Accept-Language': 'zh-cn',
-			'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=Valid'
-		}
-
-	def get_list_all(self):
-		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=Valid'
-		headers = {
-			'Host': 'm.cnipr.com:8081',
-			'Cookie': 'TailorID=3208de0a93dfd94e069897797de339da92c4',
-			'Upgrade-Insecure-Requests': '1',
-			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432',
-			'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/index',
-			'Accept-Language': 'zh-cn'
-		}
+	# def get_list_all_other(self):
+	# 	url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=AtTrial'
+	# 	url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=inValid'
+	# 	headers = {
+	# 		'Host': 'm.cnipr.com:8081',
+	# 		'Accept': '*/*',
+	# 		'Cookie': 'TailorID=3208de0a93dfd94e069897797de339da92c4',
+	# 		'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432',
+	# 		'Accept-Language': 'zh-cn',
+	# 		'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=Valid'
+	# 	}
+	#
+	# def get_list_all(self):
+	# 	url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=Valid'
+	# 	headers = {
+	# 		'Host': 'm.cnipr.com:8081',
+	# 		'Cookie': 'TailorID=3208de0a93dfd94e069897797de339da92c4',
+	# 		'Upgrade-Insecure-Requests': '1',
+	# 		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+	# 		'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432',
+	# 		'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/index',
+	# 		'Accept-Language': 'zh-cn'
+	# 	}
 
 	def get_list_other(self):
 		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=2&limit=30&strWhere=荷兰应用科学研究会(TNO)&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=AtTrial'
@@ -80,10 +90,8 @@ class CniprRequest(object):
 			'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/index',
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432',
-
-			# 'User-Agent': 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50'
 		}
-		response = requests.get(url, headers=headers)
+		response = requests.get(url, headers=headers, proxies=self.proxies)
 		# print(response.text)
 
 		with open('list.html', 'w') as f:
