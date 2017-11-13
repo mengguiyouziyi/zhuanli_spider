@@ -125,20 +125,24 @@ def main(*args):
 		# value_list = []
 		for result in results:
 			i += 1
+			title = result['title']
+			abs = result['abs']
+			appcoun = result['appcoun']
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
-			if result['appcoun'] != 'CN' or result['title'].replace(' ', '').isalpha():
+			if appcoun != 'CN' or title.replace(' ', '').isalpha():
 				continue
-			som = result['title'] + result['abs']
+			som = title + ' ' + abs
 			is_have = False
 			for w in words:
 				if w not in som:
+					print(i, 'not in', title)
 					continue
 				else:
-					print(i, result['title'])
+					print(i, 'is in', title)
 					result['appcoun'] = w
 					is_have = True
 			if '可自发电' in som and '纳米' in som:
-				print(i, result['title'])
+				print(i, 'is in', title)
 				result['appcoun'] = '可自发电+纳米'
 				is_have = True
 			if not is_have:
@@ -152,6 +156,7 @@ def main(*args):
 			# 	continue
 			values = [result[columns_list[i].strip()] for i in range(num)]
 			insertManyFun(args[3], args[4], values)
+			print(i, 'insert', title)
 
 		# 	value_list.append(values)
 		# 	if len(value_list) == 5:
