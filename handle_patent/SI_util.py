@@ -94,6 +94,7 @@ def _sqlObj(db):
 	cursor = connect.cursor()
 	return connect, cursor
 
+
 # def _sqlObj1(db):
 # 	"""
 # 	10.252.0.52
@@ -128,25 +129,26 @@ def main(*args):
 			title = result['title']
 			abs = result['abs']
 			appcoun = result['appcoun']
+			pubnumber = result['pubnumber']
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
 			if appcoun != 'CN' or title.replace(' ', '').isalpha():
 				continue
+			print(i, pubnumber, 'unknow', title)
 			som = title + ' ' + abs
 			is_have = False
 			for w in words:
 				if w not in som:
-					print(i, 'not in', title)
+					# print(i, 'not in', title)
 					continue
 				else:
-					print(i, 'is in', title)
 					result['appcoun'] = w
 					is_have = True
 			if '可自发电' in som and '纳米' in som:
-				print(i, 'is in', title)
 				result['appcoun'] = '可自发电+纳米'
 				is_have = True
 			if not is_have:
 				continue
+			print(i, pubnumber, 'have', title)
 			# # 去空
 			# n = 0
 			# for val in result.values():
@@ -156,7 +158,7 @@ def main(*args):
 			# 	continue
 			values = [result[columns_list[i].strip()] for i in range(num)]
 			insertManyFun(args[3], args[4], values)
-			print(i, 'insert', title)
+			print(i, pubnumber, 'seccess', title)
 
 		# 	value_list.append(values)
 		# 	if len(value_list) == 5:
