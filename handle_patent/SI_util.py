@@ -133,7 +133,7 @@ def main(*args):
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
 			if appcoun != 'CN' or title.replace(' ', '').isalpha():
 				continue
-			print(i, pubnumber, 'unknow', title)
+			# print(i, pubnumber, 'unknow', title)
 			som = title + ' ' + abs
 			is_have = False
 			for w in words:
@@ -148,7 +148,7 @@ def main(*args):
 				is_have = True
 			if not is_have:
 				continue
-			print(i, pubnumber, 'have', title)
+			# print(i, pubnumber, 'have', title)
 			# # 去空
 			# n = 0
 			# for val in result.values():
