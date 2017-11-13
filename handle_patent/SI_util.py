@@ -134,6 +134,7 @@ def main(*args):
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
 			if appcoun != 'CN' or title.replace(' ', '').isalpha():
 				continue
+			print(i)
 			# print(i, pubnumber, 'unknow', title)
 			som = title + ' ' + abs
 			is_have = False
