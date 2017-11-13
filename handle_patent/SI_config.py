@@ -21,7 +21,7 @@ sel_inser_list = [
 	# {'sel_columns': 'comp_name, intro', 'sel_table': 'jianjie_huangye88_all', 'db': 'spider',
 	#  'inser_table': 'comp_intro_huangye88', 'inser_columns': '(comp_full_name, intro)'},
 	#
-	{'sel_columns': 'title, abs, pubnumber, appdate, applicantname, appcoun', 'sel_table': 'patent_1', 'db': 'spider',
+	{'sel_columns': 'title, abs, pubnumber, appdate, applicantname, appcoun', 'sel_table': 'patent_3', 'db': 'spider',
 	 'inser_table': 'patent_nami_chonggao', 'inser_columns': '(title, abs, pubnumber, appdate, applicantname, guanjianzi)'},
 
 	# spider.hw_app
