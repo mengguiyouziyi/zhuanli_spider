@@ -63,9 +63,8 @@ def insertManyFun(tab, columns, args_list):
 	print(insert_sql)
 	insert_con, insert_cur = _sqlObj('spider')
 	try:
-		insert_cur.executemany(insert_sql, args_list)
+		insert_cur.execute(insert_sql, args_list)
 		insert_con.commit()
-		print('insert', len(args_list))
 	except:
 		traceback.print_exc()
 	finally:
@@ -95,16 +94,15 @@ def _sqlObj(db):
 	cursor = connect.cursor()
 	return connect, cursor
 
-
-def _sqlObj1(db):
-	"""
-	10.252.0.52
-	参数：数据库
-	"""
-	connect = pymysql.connect(host='10.252.0.52', port=3306, user='etl_tmp', password='UsF4z5HE771KQpra', db=db,
-	                          charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-	cursor = connect.cursor()
-	return connect, cursor
+# def _sqlObj1(db):
+# 	"""
+# 	10.252.0.52
+# 	参数：数据库
+# 	"""
+# 	connect = pymysql.connect(host='10.252.0.52', port=3306, user='etl_tmp', password='UsF4z5HE771KQpra', db=db,
+# 	                          charset='utf8', cursorclass=pymysql.cursors.DictCursor)
+# 	cursor = connect.cursor()
+# 	return connect, cursor
 
 
 def main(*args):
@@ -124,7 +122,7 @@ def main(*args):
 			# continue
 			return
 		start += len(results)
-		value_list = []
+		# value_list = []
 		for result in results:
 			i += 1
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
@@ -153,13 +151,15 @@ def main(*args):
 			# if n >= num - 1:
 			# 	continue
 			values = [result[columns_list[i].strip()] for i in range(num)]
-			value_list.append(values)
-			if len(value_list) == 5:
-				insertManyFun(args[3], args[4], value_list)
-				value_list.clear()
-			else:
-				continue
-		insertManyFun(args[3], args[4], value_list)
+			insertManyFun(args[3], args[4], values)
+
+		# 	value_list.append(values)
+		# 	if len(value_list) == 5:
+		# 		insertManyFun(args[3], args[4], value_list)
+		# 		value_list.clear()
+		# 	else:
+		# 		continue
+		# insertManyFun(args[3], args[4], value_list)
 
 
 if __name__ == '__main__':
