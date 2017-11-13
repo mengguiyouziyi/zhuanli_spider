@@ -5,6 +5,7 @@ from urllib.parse import quote_plus
 class CniprRequest(object):
 	def __init__(self):
 		self.session = requests.session()
+		self.id = self.login()
 
 	def login(self):
 		headers = {
@@ -23,6 +24,7 @@ class CniprRequest(object):
 		response = self.session.request("POST", login_url, headers=headers, data=payload)
 		print(response.text)
 		print(response.cookies.items())
+		return response.cookies.items()[0][1]
 
 	def get_list_all_other(self):
 		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=1&limit=10&strWhere=%E6%97%A0%E9%94%A1%E5%8D%93%E4%BF%A1%E4%BF%A1%E6%81%AF%E7%A7%91%E6%8A%80%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=3&type=AtTrial'
@@ -67,13 +69,13 @@ class CniprRequest(object):
 
 
 	def get_list(self):
-		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=30&strWhere=贵州省平坝酒厂有限责任公司&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type=Valid'
+		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=30&strWhere=江苏远东电机制造有限公司&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type=Valid'
 		headers = {
 			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'Accept-Encoding': 'gzip, deflate',
 			'Accept-Language': 'zh-cn',
 			'Connection': 'keep-alive',
-			'Cookie': 'TailorID=bc7b033914beb146361b9861aa9d0806438a',
+			'Cookie': 'TailorID={}'.format(self.id),
 			'Host': 'm.cnipr.com:8081',
 			'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/index',
 			'Upgrade-Insecure-Requests': '1',
@@ -108,7 +110,6 @@ class CniprRequest(object):
 
 if __name__ == '__main__':
 	cnipr = CniprRequest()
-	# cnipr.login()
 	cnipr.get_list()
-	# get_list_other()
-	# get_detail()
+# get_list_other()
+# get_detail()
