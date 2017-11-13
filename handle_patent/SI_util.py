@@ -60,7 +60,7 @@ def insertManyFun(tab, columns, args_list):
 	col_num = len(columns.split(', '))
 	insert_sql = """insert into {tab} {columns} VALUES {val}""".format(tab=tab, columns=columns,
 	                                                                   val=_handle_str(col_num))
-	print(insert_sql)
+	# print(insert_sql)
 	insert_con, insert_cur = _sqlObj('spider')
 	try:
 		insert_cur.executemany(insert_sql, args_list)
@@ -154,6 +154,7 @@ def main(*args):
 			value_list.append(values)
 			if len(value_list) == 5:
 				insertManyFun(args[3], args[4], value_list)
+				print('insert 5')
 				value_list.clear()
 			else:
 				continue
