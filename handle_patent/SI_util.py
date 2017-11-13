@@ -60,11 +60,12 @@ def insertManyFun(tab, columns, args_list):
 	col_num = len(columns.split(', '))
 	insert_sql = """insert into {tab} {columns} VALUES {val}""".format(tab=tab, columns=columns,
 	                                                                   val=_handle_str(col_num))
-	# print(insert_sql)
+	print(insert_sql)
 	insert_con, insert_cur = _sqlObj('spider')
 	try:
 		insert_cur.executemany(insert_sql, args_list)
 		insert_con.commit()
+		print('insert', len(args_list))
 	except:
 		traceback.print_exc()
 	finally:
@@ -126,7 +127,6 @@ def main(*args):
 		value_list = []
 		for result in results:
 			i += 1
-			print(i)
 			# title, abs, pubnumber, appdate, applicantname, appcoun, guanjianzi
 			if result['appcoun'] != 'CN' or result['title'].replace(' ', '').isalpha():
 				continue
@@ -136,10 +136,12 @@ def main(*args):
 				if w not in som:
 					continue
 				else:
-					result['guanjianzi'] = w
+					print(i, result['title'])
+					result['appcoun'] = w
 					is_have = True
 			if '可自发电' in som and '纳米' in som:
-				result['guanjianzi'] = '可自发电+纳米'
+				print(i, result['title'])
+				result['appcoun'] = '可自发电+纳米'
 				is_have = True
 			if not is_have:
 				continue
@@ -154,7 +156,6 @@ def main(*args):
 			value_list.append(values)
 			if len(value_list) == 5:
 				insertManyFun(args[3], args[4], value_list)
-				print('insert 5')
 				value_list.clear()
 			else:
 				continue
