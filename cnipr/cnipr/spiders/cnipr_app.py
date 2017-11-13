@@ -13,27 +13,55 @@ class TouzishijianSpider(scrapy.Spider):
 	name = 'cnipr_app'
 	custom_settings = {
 		'DEFAULT_REQUEST_HEADERS': {
-			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-			'Accept-Encoding': 'gzip, deflate',
-			'Accept-Language': 'zh-cn',
+			# 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			# 'Accept-Encoding': 'gzip, deflate',
+			# 'Accept-Language': 'zh-cn',
 			'Connection': 'keep-alive',
-			'Cookie': 'TailorID=3208de0a93dfd94e069897797de339da92c4',
+			# 'Cookie': 'TailorID=3208de0a93dfd94e069897797de339da92c4',
 			'Host': 'm.cnipr.com:8081',
 			'Referer': 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/index',
-			'Upgrade-Insecure-Requests': '1',
-			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432'
+			# 'Upgrade-Insecure-Requests': '1',
+			# 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0_3 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Mobile/15A432'
 		}
 	}
-	cookies = "yunsuo_session_verify=450304a51a18108086355b1d67d81ee2; _ubm_ref.jEVZOqlU=%5B%22%22%2C%22%22%2C1510214249%2C%22http%3A%2F%2Fsearch.cnipr.com%2Fpages!advSearch.action%22%5D; _ubm_id.jEVZOqlU=5dbeb122d94854a8; checkedwords=0%2C1%2C2%2C3%2C4; advchannel=FMZL%2CSYXX%2CWGZL%2CFMSQ%2CTWZL%2CHKPATENT%2CUSPATENT%2CEPPATENT%2CJPPATENT%2CWOPATENT%2CGBPATENT%2CCHPATENT%2CDEPATENT%2CKRPATENT%2CFRPATENT%2CRUPATENT%2CASPATENT%2CATPATENT%2CGCPATENT%2CITPATENT%2CAUPATENT%2CAPPATENT%2CCAPATENT%2CSEPATENT%2CESPATENT%2COTHERPATENT; searchcol=%u7533%u8BF7%uFF08%u4E13%u5229%u6743%uFF09%u4EBA; yunsuo_session_verify=450304a51a18108086355b1d67d81ee2; _ubm_ref.jEVZOqlU=%5B%22%22%2C%22%22%2C1510214249%2C%22http%3A%2F%2Fsearch.cnipr.com%2Fpages!advSearch.action%22%5D; _ubm_id.jEVZOqlU=5dbeb122d94854a8; _ubm_ses.jEVZOqlU=*; _gscu_719616686=0950182114s1dh12; _gscs_719616686=t10195927cruhrz13|pv:14; _gscbrs_719616686=1; _trs_uv=j9geerzw_1186_brj5; JSESSIONID=85855B60771EC5F937770982B5B26331; _gscu_719616686=0950182114s1dh12; _gscs_719616686=t10195927cruhrz13|pv:20; _gscbrs_719616686=1; _trs_uv=j9geerzw_1186_brj5; _trs_ua_s_1=j9sc0g06_1186_k5zc",
-	cookie_dict = dict((line.split('=') for line in choice(cookies).strip().split(";")))
+
+	# cookies = ['TailorID=3208de0a93dfd94e069897797de339da92c4']
+	# cookie_dict = dict((line.split('=') for line in choice(cookies).strip().split(";")))
 
 	def start_requests(self):
-		start_url = "http://search.cnipr.com/search%21doOverviewSearch.action"
-		f = 'strWhere=%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%3D%28%E4%B8%AD%E5%9B%BD%E7%9F%B3%E6%B2%B9%E5%8C%96%E5%B7%A5%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8%29&yuyijs=&start=1&saveFlag=1&limit=10&strSynonymous=&crossLanguage=&islogicsearch=false&saveExp=&showhint=&mpage=null&channelId=FMZL&channelId=SYXX&channelId=WGZL&channelId=FMSQ&channelId=TWZL&channelId=HKPATENT&channelId=USPATENT&channelId=EPPATENT&channelId=JPPATENT&channelId=WOPATENT&channelId=GBPATENT&channelId=CHPATENT&channelId=DEPATENT&channelId=KRPATENT&channelId=FRPATENT&channelId=RUPATENT&channelId=ASPATENT&channelId=ATPATENT&channelId=GCPATENT&channelId=ITPATENT&channelId=AUPATENT&channelId=APPATENT&channelId=CAPATENT&channelId=SEPATENT&channelId=ESPATENT&channelId=OTHERPATENT&trsq=1&dan=1&txt_A=&txt_B=&txt_C=&txt_D=&txt_E=&txt_F=&txt_Q=&txt_R=&txt_I=%E4%B8%AD%E5%9B%BD%E7%9F%B3%E6%B2%B9%E5%8C%96%E5%B7%A5%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&txt_J=&txt_G=&txt_H=&txt_L=&txt_O=&text=&txt_K=&txt_M=&txt_N=&txt_U=&txt_T=&txt_V=&txt_X=&mpage=advsch'
-		# formdata = dict([m.split('=') for m in f.split('&')])
-		yield scrapy.Request(start_url, method='POST', body=f, cookies=self.cookie_dict)
+		login_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/login!goonlogin.action?rd=0.3424056342857026'
+		payload = {'username': 'wlglzx', 'password': '!QAZ2wsx'}
+		return [scrapy.FormRequest(login_url, formdata=payload, callback=self.check_login)]
+
+	def check_login(self, response):
+		comp_name = '江苏远东电机制造有限公司'
+		valid_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=30&strWhere={}&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type=Valid'.format(
+			comp_name)
+		yield scrapy.Request(valid_url)
+		other_urls = [
+			'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=2&limit=30&strWhere={}&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type={}'.format(
+				comp_name, cat) for cat in ['AtTrial', 'inValid']]
+		for ourl in other_urls:
+			yield scrapy.Request(ourl, callback=self.parse_trial)
+		detail_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doDetailSearch.action?Data=strWhere={}&start=4&recordCursor=39&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL%2CTWZL%2CHKPATENT%2CUSPATENT%2CJPPATENT%2CEPPATENT%2CWOPATENT%2CGBPATENT%2CDEPATENT%2CFRPATENT%2CCHPATENT%2CKRPATENT%2CRUPATENT%2CAPPATENT%2CATPATENT%2CAUPATENT%2CITPATENT%2CSEPATENT%2CCAPATENT%2CESPATENT%2CGCPATENT%2CASPATENT%2COTHERPATENT%2CTWPATENT&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E6%9C%89%E6%95%88%22%2C%22where%22%3A%2210%22%7D%5D&title=10.%E4%B8%80%E7%A7%8D%E5%A4%A7%E5%8F%A3%E5%BE%84%E9%AB%98%E6%B8%A9%E8%80%90%E7%A3%A8%E5%B9%B3%E6%9D%BF%E9%97%B8%E9%98%80&keyword=%E4%B8%AD%E7%9F%B3%E5%8C%96'.format(
+			comp_name)
+		yield scrapy.Request(detail_url, callback=self.parse_detail)
 
 	def parse(self, response):
-		print(response.text)
+		select = Selector(text=response.text)
+		print(response.url)
+		with open('list1.html', 'w') as f:
+			f.writelines(response.text)
 
-	# select = Selector(text=response.text)
+	def parse_trial(self, response):
+		select = Selector(text=response.text)
+		print(response.url)
+		html_path = 'list2.html' if 'AtTrial' in response.url else 'list3.html'
+		with open(html_path, 'w') as f:
+			f.writelines(response.text)
+
+	def parse_detail(self, response):
+		select = Selector(text=response.text)
+		print(response.url)
+		with open('detail.html', 'w') as f:
+			f.writelines(response.text)
