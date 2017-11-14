@@ -220,12 +220,7 @@ def main():
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		# 7380
-		# timeout:1889,2233,2595,2967,3400,3531,5632,7130,7358
-		# unknowerror:1083
-		# Syntax error:3492,4729 {'access_token': '1723a76d-45fe-4b0f-8d3a-67473a1d3314', 'express': '申请人=卫材R&D管理有限公司', 'page': '1', 'client_id': '6050f8adac110002270d833aed28242d', 'page_row': '100', 'scope': 'rea     d_cn'}
-		# 51731～～～～44398 行
-		if id < 238761:
+		if id < 296460:
 			continue
 		response = get_res(token, result, 1)
 		if response == -1:

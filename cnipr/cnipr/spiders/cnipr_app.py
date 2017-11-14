@@ -69,13 +69,9 @@ class TouzishijianSpider(scrapy.Spider):
 		self.cookie_dict = self.login()
 
 	def login(self):
-
 		login_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/login!goonlogin.action?rd=0.3424056342857026'
 		payload = {'username': 'wlglzx', 'password': '!QAZ2wsx'}
 		# payload = {'username': 'mengguiyouziyi', 'password': '3646287'}
-
-
-
 		response = requests.request("POST", login_url, headers=self.headers, data=payload, proxies=self.proxies)
 		cookie_dict = dict(response.cookies.items())
 		print('cookie', cookie_dict)
@@ -86,20 +82,19 @@ class TouzishijianSpider(scrapy.Spider):
 		valid_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.action?DATA-start=1&limit=10&strWhere={}&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type=Valid'.format(
 			comp_name)
 		yield scrapy.Request(valid_url, cookies=self.cookie_dict)
-		other_urls = [
-			'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=2&limit=10&strWhere={}&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type={}'.format(
-				comp_name, cat) for cat in ['AtTrial', 'inValid']]
-		for ourl in other_urls:
-			yield scrapy.Request(ourl, callback=self.parse_trial, cookies=self.cookie_dict)
+		# other_urls = [
+		# 	'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doOverviewSearch4Index.AJAX-action?DATA-start=2&limit=10&strWhere={}&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=1&type={}'.format(
+		# 		comp_name, cat) for cat in ['AtTrial', 'inValid']]
+		# for ourl in other_urls:
+		# 	yield scrapy.Request(ourl, callback=self.parse_trial, cookies=self.cookie_dict)
 		# detail_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/search!doDetailSearch.action?Data=strWhere={}&start=4&recordCursor=39&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL%2CTWZL%2CHKPATENT%2CUSPATENT%2CJPPATENT%2CEPPATENT%2CWOPATENT%2CGBPATENT%2CDEPATENT%2CFRPATENT%2CCHPATENT%2CKRPATENT%2CRUPATENT%2CAPPATENT%2CATPATENT%2CAUPATENT%2CITPATENT%2CSEPATENT%2CCAPATENT%2CESPATENT%2CGCPATENT%2CASPATENT%2COTHERPATENT%2CTWPATENT&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E6%9C%89%E6%95%88%22%2C%22where%22%3A%2210%22%7D%5D&title=10.%E4%B8%80%E7%A7%8D%E5%A4%A7%E5%8F%A3%E5%BE%84%E9%AB%98%E6%B8%A9%E8%80%90%E7%A3%A8%E5%B9%B3%E6%9D%BF%E9%97%B8%E9%98%80&keyword=%E4%B8%AD%E7%9F%B3%E5%8C%96'.format(
 		# 	comp_name)
 		# yield scrapy.Request(detail_url, callback=self.parse_detail, cookies=self.cookie_dict)
 
 	def captcha(self, response):
-		captcha_url = ''
-		t = self.session.get(captcha_url, headers=self.headers)
+		# t = self.session.get(captcha_url, headers=self.headers)
 		with open("captcha.jpg", "wb") as f:
-			f.write(t.content)
+			f.write(response.body)
 		from PIL import Image
 		try:
 			im = Image.open("captcha.jpg")
@@ -108,10 +103,20 @@ class TouzishijianSpider(scrapy.Spider):
 		except:
 			pass
 		captcha = input("输入验证码\n>")
+		url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/checkcode.action?checkCode={}'.format(captcha)
+		yield scrapy.Request(url, cookies=self.cookie_dict)
+
+	def check_captcha(self, response):
+		if 'true' in response.text:
+			print('验证码正确')
+			self.start_requests()
 
 	def parse(self, response):
-
 		print(response.url)
+		if '申请号：' not in response.text:
+			cap_url = 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/RandomCode'
+			yield scrapy.Request(cap_url, callback=self.captcha, cookies=self.cookie_dict)
+
 		select = Selector(text=response.text)
 		with open('list1.html', 'w') as f:
 			f.writelines(response.text)
