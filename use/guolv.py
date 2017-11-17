@@ -41,7 +41,7 @@ for j, d in enumerate(zhuanli_dicts):
 		aux_che.append(d)
 		continue
 args = [(one['only_id'], one['comp_full_name'], one['shengqingliang']) for one in aux_che]
-cur_zhuanli.executemany(sql_in, aux_che)
+cur_zhuanli.executemany(sql_in, args)
 etl.commit()
 
 etl.close()
