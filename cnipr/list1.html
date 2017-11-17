@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+        <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+        <!-- Bootstrap -->
+        <link rewrited="false" href="http://m.cnipr.com:8081/tailor/http://m.cnipr.com:8090/resource/SearchCniprRes/css/bootstrap.min.css">
+        <script>
+        (function(win) {
+            var remCalc = {};
+            var docEl = win.document.documentElement,
+                tid;
+
+            function refreshRem() {
+                // 获取当前窗口的宽度
+                var width = docEl.getBoundingClientRect().width;
+                // 大于640px 按640算
+                if (width > 640) { width = 640 }
+                // 把窗口的宽度固定分为10份 也就是10rem
+                // 按视觉稿640算  640/10=64px  那么1rem = 64px
+                // 640视觉中 80px*80px的按钮 转换为rem  80/64 = 1.25rem
+                // 按钮的宽高固定为  1.25rem * 1.25rem
+                // 当窗口宽度缩放为 320px的时候
+                // 那么 1rem = 32px
+                // 原来 80px*80px的按钮现在变为 1.25rem * 32px = 40px
+                // 按钮变为 40px * 40px
+                // 其他宽度也类似
+                //
+                // cms做法也类似
+                // 只是我们把窗口宽度固定分为 6.4份，即6.4rem
+                // 所以 1rem = 100px
+                // 640视觉中 80px*80px的按钮 转换为rem  80/100 = 0.8rem
+                // ....其他也差不多
+                //
+                //
+                // 对比
+                // 其实也就是计算rem的问题 视觉稿量出来的值  除64 或 100的问题
+                // 除100 总比 除64 好口算
+                // 就算用sass写个 @function px2rem代替口算
+                // .8rem 总比输入 px2rem(80)少几个字符
+                //
+                //
+                var rem = width / 6; // cms 只要把这行改成  var rem = width /640 * 100
+                docEl.style.fontSize = rem + "px";
+                remCalc.rem = rem;
+                //误差、兼容性处理
+                var actualSize = parseFloat(window.getComputedStyle(document.documentElement)["font-size"]);
+                if (actualSize !== rem && actualSize > 0 && Math.abs(actualSize - rem) > 1) {
+                    var remScaled = rem * rem / actualSize;
+                    docEl.style.fontSize = remScaled + "px"
+                }
+            }
+
+            //函数节流，避免频繁更新
+            function dbcRefresh() {
+                clearTimeout(tid);
+                tid = setTimeout(refreshRem, 100)
+            }
+
+            //窗口更新动态改变font-size
+            win.addEventListener("resize", function() { dbcRefresh() }, false);
+
+            //页面显示的时候再计算一次   难道切换窗口之后再切换来窗口大小会变?....
+            win.addEventListener("pageshow", function(e) {
+                if (e.persisted) { dbcRefresh() }
+            }, false);
+            refreshRem();
+            remCalc.refreshRem = refreshRem;
+            remCalc.rem2px = function(d) {
+                var val = parseFloat(d) * this.rem;
+                if (typeof d === "string" && d.match(/rem$/)) { val += "px" }
+                return val
+            };
+            remCalc.px2rem = function(d) {
+                var val = parseFloat(d) / this.rem;
+                if (typeof d === "string" && d.match(/px$/)) { val += "rem" }
+                return val
+            };
+            win.remCalc = remCalc
+        })(window);
+        </script>
+        <title>主页</title>
+        <style>
+        html,
+        body {
+            font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        *{-webkit-tap-highlight-color: rgba(0,0,0,0);-webkit-tap-highlight-color:transparent;}
+        p {
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+            margin: 6px 0;
+        }
+
+        p span {
+            display: inline-block;
+            width: 40%;
+        }
+
+        p span:nth-of-type(2) {
+            width: 60%;
+        }
+
+        input {
+            -webkit-appearance: none;
+        }
+
+        .app-view {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            padding-top: 1.5rem;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        a:active {
+            text-decoration: none;
+        }
+
+        a:focus {
+            text-decoration: none;
+        }
+
+        .head-nav {
+            width: 100%;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+
+        .nav-bar {
+            width: 100%;
+            height: 0.8rem;
+            line-height: 0.8rem;
+            position: relative;
+            background: #007ae4;
+        }
+
+        .left-btn {
+            position: absolute;
+            height: 0.8rem;
+            line-height: 0.8rem;
+            left: 0;
+            color: #fff;
+            font-size: 14px;
+            top: 0;
+            text-indent: 21px;
+            background: url('http://m.cnipr.com:8080/ZhihuiIPApp/resource/images/return_btn.png') 4px center no-repeat;
+            background-size: 13px 21px;
+        }
+
+        .nav-title {
+            text-align: center;
+            color: #fff;
+            font-size: 0.3rem;
+
+        }
+
+        .tab-menu {
+            width: 100%;
+            height: 0.7rem;
+            line-height: 0.7rem;
+            box-shadow: inset 0px -1px 0px #ddd;
+            overflow: hidden;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+
+        .tab-menu li {
+            float: left;
+            width: 33.33%;
+            text-align: center;
+            height: 0.7rem;
+            font-size: 0.25rem
+        }
+
+        .tab-menu .active {
+            box-shadow: inset 0px -2px 0px #007ae4;
+            color: #007ae4
+        }
+
+        .content {
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+            overflow-y: scroll;
+            background: #f5f5f5;
+            font-size: 0;
+        }
+
+        .content section {
+            padding: 10px 0;
+            display: none;
+        }
+
+        .list-item {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 15px;
+            overflow: hidden;
+        }
+
+        .list-item:first-child {
+            border-top: 1px solid #ddd;
+        }
+
+        .list-item .list-title {
+            font-size: 0.3rem;
+            margin: 18px 0;
+            position: relative;
+        }
+
+        .list-item .list-title strong {
+            padding-left: 28px;
+            font-size: 14px;
+            background-color: #fff
+        }
+
+        .list-item .list-title strong.red {
+            color: #e41212;
+        }
+
+        .list-item .list-title strong.green {
+            color: #279a29;
+        }
+
+        .list-item .list-title strong.yellow {
+            color: #ff8a00;
+        }
+
+        .list-item .text-muted {
+            font-size: 0.2rem;
+            white-space: nowrap;
+            height: 0.4rem;
+            line-height: 0.4rem;
+        }
+
+        .text-danger {
+            color: red;
+        }
+
+         ::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .iframeWapper {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 100%;
+            -webkit-overflow-scrolling:touch;
+            transition: 0.3s ease;
+            background-color: #fff;
+        }
+        #imgCode {
+            display: none;
+            position: fixed;
+            font-size: 0.3em;
+            top: 20%;
+            left: 1%;
+            padding: 4% 4% 6% 4%;
+            width: 90%;
+            background-color: #fff;
+        }
+
+        #imgCode p {
+            color: #f00;
+        }
+
+        #imgBox {
+            display: inline-block;
+            vertical-align: middle;
+            width: 48%;
+            text-align: center;
+            margin: 4% 0;
+        }
+
+        #inputCode {
+            width: 46%;
+            display: inline-block;
+            vertical-align: top;
+            height: 36px;
+            margin: 4% 0;
+        }
+
+        #inputCode input {
+            display: block;
+            height: 100%;
+            padding: 0;
+            width: 96%;
+            border: 1px solid #d5d5d5;
+            padding-left: 4%;
+        }
+
+        #imgCodeSub {
+            font-size: 0.8em;
+            text-align: center;
+            line-height: 0.5rem;
+            color: #fff;
+            font-weight: bold;
+            background-color: #007ae4;
+        }
+        #msk{position: fixed;width: 100%;height: 100%;left: 0;bottom: 0; right: 0;top: 0; z-index: 99999;background: #000;opacity: 0.2;}
+        </style>
+    </head>
+
+    <body>
+        <div class="app-view" id="tab-box">
+            <div class="head-nav">
+                <div class="nav-bar">
+                    <div class="left-btn" onclick="__main__.ToOldPage()">
+                        返回</div>
+                            <div class="nav-title">
+                                北京纳米能源与系统研究所&type=Valid
+                            </div>
+                            <div class="right-btn">
+                            </div>
+                    </div>
+                    <ul class="tab-menu">
+                        <li class="hasLoad active" data-value="Valid" data-start=1 data-more="wgViewmodle=&strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D('%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25')%20&start=1&limit=10&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&keyword2Save=&key2Save=&forward=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D&username=&password=" data-all="155">有效<small>（29）</small></li>
+                        <li data-value="AtTrial" data-start=1>在审<small>（155）</small></li>
+                        <li data-value="inValid" data-start=1>无效<small>（0）</small></li>
+                    </ul>
+                </div>
+                <div class="content">
+                    <section style="display: block" id="Valid">
+                        undefined<div class="list-item" onclick="viewDetail(0,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							1.异质复合型光催化剂及其制备方法</h5><p><span>申请号：</span><span>CN201510083742.X</span></p><p><span>公开（公告）号：</span><span> CN105983410A </span></p><p><span>申请日：</span><span> 2015.02.16 </span></p><p><span>公开（公告）日：</span><span> 2016.10.05 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(1,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							2.基于接触起电的背栅场效应晶体管</h5><p><span>申请号：</span><span>CN201410393613.6</span></p><p><span>公开（公告）号：</span><span> CN105470313A </span></p><p><span>申请日：</span><span> 2014.08.12 </span></p><p><span>公开（公告）日：</span><span> 2016.04.06 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(2,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							3.聚左旋乳酸纤维材料在压电器件中的应用</h5><p><span>申请号：</span><span>CN201610200886.3</span></p><p><span>公开（公告）号：</span><span> CN107293639A </span></p><p><span>申请日：</span><span> 2016.03.31 </span></p><p><span>公开（公告）日：</span><span> 2017.10.24 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(3,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							4.压电材料压电<span class="text-danger">系</span>数的测试方法及测试装置</h5><p><span>申请号：</span><span>CN201610170392.5</span></p><p><span>公开（公告）号：</span><span> CN107228990A </span></p><p><span>申请日：</span><span> 2016.03.23 </span></p><p><span>公开（公告）日：</span><span> 2017.10.03 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(4,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							5.磁场调控LED发光亮度的复合结构及制作方法</h5><p><span>申请号：</span><span>CN201410208553.6</span></p><p><span>公开（公告）号：</span><span> CN105098000A </span></p><p><span>申请日：</span><span> 2014.05.16 </span></p><p><span>公开（公告）日：</span><span> 2015.11.25 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(5,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							6.一种除尘模块及气体除尘装置</h5><p><span>申请号：</span><span>CN201610338927.5</span></p><p><span>公开（公告）号：</span><span> CN106560250A </span></p><p><span>申请日：</span><span> 2016.05.19 </span></p><p><span>公开（公告）日：</span><span> 2017.04.12 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(6,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							7.一种可变形柔性<span class="text-danger">纳</span><span class="text-danger">米</span>发电机、制备方法及制成的传感器</h5><p><span>申请号：</span><span>CN201610811664.5</span></p><p><span>公开（公告）号：</span><span> CN106655874A </span></p><p><span>申请日：</span><span> 2016.09.08 </span></p><p><span>公开（公告）日：</span><span> 2017.05.10 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(7,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							8.主动式触觉传感器</h5><p><span>申请号：</span><span>CN201610894052.7</span></p><p><span>公开（公告）号：</span><span> CN106608612A </span></p><p><span>申请日：</span><span> 2016.10.13 </span></p><p><span>公开（公告）日：</span><span> 2017.05.03 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(8,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							9.一种柔性超级电容器及其制备方法</h5><p><span>申请号：</span><span>CN201610452941.8</span></p><p><span>公开（公告）号：</span><span> CN106601491A </span></p><p><span>申请日：</span><span> 2016.06.21 </span></p><p><span>公开（公告）日：</span><span> 2017.04.26 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div><div class="list-item" onclick="viewDetail(9,'strWhere=%E5%90%8D%E7%A7%B0%2C%E7%94%B3%E8%AF%B7%EF%BC%88%E4%B8%93%E5%88%A9%E6%9D%83%EF%BC%89%E4%BA%BA%2C%E5%8F%91%E6%98%8E%EF%BC%88%E8%AE%BE%E8%AE%A1%EF%BC%89%E4%BA%BA%2C%E4%BC%98%E5%85%88%E6%9D%83%E5%8F%B7%2C%E4%B8%93%E5%88%A9%E4%BB%A3%E7%90%86%E6%9C%BA%E6%9E%84%2C%E4%BB%A3%E7%90%86%E4%BA%BA%2C%E5%9C%B0%E5%9D%80%2C%E7%94%B3%E8%AF%B7%E5%9B%BD%E4%BB%A3%E7%A0%81%2C%E5%9B%BD%E7%9C%81%E4%BB%A3%E7%A0%81%2C%E6%91%98%E8%A6%81%2C%E4%B8%BB%E6%9D%83%E9%A1%B9%20%2B%3D(\'%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80%25\')%20&start=1&recordCursor=1&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL&strSynonymous=&yuyijs=&filterChannel=&otherWhere=%5B%7B%22kind%22%3A%22%E4%B8%93%E5%88%A9%E6%9D%83%E7%8A%B6%E6%80%81%22%2C%22showwhere%22%3A%22%E5%9C%A8%E5%AE%A1%22%2C%22where%22%3A%2230%22%7D%5D',this)"><h5 class="list-title">
+							10.一种柔性<span class="text-danger">纳</span><span class="text-danger">米</span>摩擦发电机、制备方法及制成的传感器</h5><p><span>申请号：</span><span>CN201610686049.6</span></p><p><span>公开（公告）号：</span><span> CN106601329A </span></p><p><span>申请日：</span><span> 2016.08.18 </span></p><p><span>公开（公告）日：</span><span> 2017.04.26 </span></p><p><span>申请（专利权）人：</span><span> 北京纳米能源与系统研究所 </span></p></div>
+                    </section>
+                    <section id="AtTrial"></section>
+                    <section id="inValid"></section>
+                </div>
+                <div id="imgCode">
+                    <p>操作过于频繁,请输入验证码</p>
+                    <div id="imgBox"></div>
+                    <div id="inputCode">
+                        <input type="text">
+                    </div>
+                    <div id="imgCodeSub" onclick="init()">提交</div>
+                </div>
+            </div>
+            <script src="http://m.cnipr.com:8081/tailor/http://m.cnipr.com:8090/resource/SearchCniprRes/js/jq-1.8.3.min.js" rewrited="false"></script>
+            <!-- Include all compiled plugins (below), or include individual files as needed -->
+            <script src="http://m.cnipr.com:8081/tailor/http://m.cnipr.com:8090/resource/SearchCniprRes/js/bootstrap.min.js" rewrited="false"></script>
+            <script src="http://m.cnipr.com:8081/tailor/http://m.cnipr.com:8090/resource/SearchCniprRes/js/layer.js" rewrited="false"></script>
+            <script>
+            /*(function(){
+                    class tools{
+                        XML(options){
+                            let req = new XMLHttpRequest()
+                            req.open(options.method || 'GET',options.url,true)
+                            options.method === 'POST'
+                                ?   req.setRequestHeader("Content-type","application/x-www-form-urlencoded; charset=UTF-8")
+                                :   false
+                            return new Promise((resolve,reject)=>{
+                                req.onreadystatechange = (e) =>{
+                                    req.readyState !== 4
+                                    ?   false
+                                    :   [200,304].indexOf(req.status) === -1
+                                        ?   reject('Serve responded with a status of '+req.status)
+                                        :   resolve(req.responseText)
+                                }
+                                req.send(options.data || void 0)
+                            })
+                        }
+                        getDom(str,isTable=false){
+                            let box = isTable ? document.createElement('table') : document.createElement('div')
+                            box.innerHTML = str
+                            return box
+                        }
+                        serializeArray(form){
+                            let r20 = /%20/g,
+                            rbracket = /\[\]$/,
+                            rCRLF = /\r?\n/g,
+                            rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
+                            rsubmittable = /^(?:input|select|textarea|keygen)/i,
+                            rcheckableType = (/^(?:checkbox|radio)$/i); 
+
+                            let eles = form.elements || form.getElementsByTagName('*')
+
+                            return [].slice.apply(eles)
+                                .filter(el=>{
+                                    let type = el.type;
+                                        return el.name && !el.getAttribute('disabled') && rsubmittable.test(el.nodeName) && !rsubmitterTypes.test(type) && (el.checked || ! rcheckableType.test(type));
+                                    })
+                                .map((ele)=>{
+                                    let v = ele.value || ele.innerText
+                                    let name = ele.name
+                                    if(ele.type == 'radio'){
+                                        if(!ele.checked){
+                                            v = ''
+                                        }
+                                    }
+                                    return !name && !v ? null : { name: ele.name, value: v.replace( rCRLF, "\r\n" ) }
+                                })
+                                .filter(x=>x.name)
+                        }
+                        checkMail(mail){
+                            return  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)
+                        }
+                        newPageLoad(url,ele,index){
+                            let w = window.top.screen.width
+                            let h = window.top.screen.height
+                            let newPageFixed = document.createElement('div')
+                            newPageFixed.className = 'iframeWapper'
+                            newPageFixed.style.height = h +'px'
+                            newPageFixed.style.width = w +'px'
+                            newPageFixed.style.WebkitOverflowScrolling = 'touch'
+                            newPageFixed.style.overflowScrolling = 'touch'
+                            newPageFixed.style.overflowY = 'scroll'
+                            newPageFixed.style.position = 'fixed'
+                            newPageFixed.style.top = '0'
+                            newPageFixed.style.left = '100%'
+                            newPageFixed.style.transition = '0.3s ease'
+                            newPageFixed.style.backgroundColor = '#fff'
+                            let iframe = document.createElement('iframe')
+                            iframe.style.border = 'none'
+                            iframe.style.height = h +'px'
+                            iframe.style.width = w +'px'
+                            iframe.setAttribute('src',url)
+                            newPageFixed.appendChild(iframe)
+                            ele ? ele.appendChild(newPageFixed) : document.body.appendChild(newPageFixed)
+                            var timer = setInterval(function(){
+                                if(iframe.contentWindow.location.href !== 'about:blank'){
+                                    clearInterval(timer)
+                                    var frameDocument = iframe.contentDocument
+                                    newPageFixed.style.left = 0
+                                    frameDocument.addEventListener('DOMContentLoaded',function(){
+                                        layer.closeAll()
+                                        parent.layer.closeAll()
+                                    },false)
+                                }
+                            },30)
+                        }
+                        ToOldPage(init){
+                            let theIframe = parent.document.getElementsByTagName('iframe')[0].parentNode
+                            theIframe.style.left = '100%'
+                            setTimeout(()=>{
+                                parent.document.body.removeChild(theIframe)
+                                if(init){
+                                    parent.init()
+                                }
+                            },200)
+                        }
+                        layerContent(text){
+                            layer.open({
+                                shadeClose : false,
+                                content : text,
+                                btn : ['确认']
+                            })
+                        }
+                        layerLoading(text){
+                             layer.open({
+                                type : 2,
+                                shadeClose : false,
+                                content : text
+                            })
+                        }
+                        layerConfirm(text,callback){
+                            layer.open({
+                                shadeClose : false,
+                                content : text,
+                                btn : ['确认','取消'],
+                                yes : callback
+                            })
+                        }
+                    }
+                    window.__main__ = new tools()
+                })()*/
+            'use strict';
+
+            var _createClass = function() {
+                function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i];
+                        descriptor.enumerable = descriptor.enumerable || false;
+                        descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true;
+                        Object.defineProperty(target, descriptor.key, descriptor); } } return function(Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+            function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+            (function() {
+                var tools = function() {
+                    function tools() {
+                        _classCallCheck(this, tools);
+                    }
+
+                    _createClass(tools, [{
+                        key: 'XML',
+                        value: function XML(options) {
+                            var req = new XMLHttpRequest();
+                            req.open(options.method || 'GET', options.url, true);
+                            options.method === 'POST' ? req.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8") : false;
+                            return new Promise(function(resolve, reject) {
+                                req.onreadystatechange = function(e) {
+                                    req.readyState !== 4 ? false : [200, 304].indexOf(req.status) === -1 ? reject('Serve responded with a status of ' + req.status) : resolve(req.responseText);
+                                };
+                                req.send(options.data || void 0);
+                            });
+                        }
+                    }, {
+                        key: 'getDom',
+                        value: function getDom(str) {
+                            var isTable = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+                            var box = isTable ? document.createElement('table') : document.createElement('div');
+                            box.innerHTML = str;
+                            return box;
+                        }
+                    }, {
+                        key: 'serializeArray',
+                        value: function serializeArray(form) {
+                            var r20 = /%20/g,
+                                rbracket = /\[\]$/,
+                                rCRLF = /\r?\n/g,
+                                rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
+                                rsubmittable = /^(?:input|select|textarea|keygen)/i,
+                                rcheckableType = /^(?:checkbox|radio)$/i;
+
+                            var eles = form.elements || form.getElementsByTagName('*');
+
+                            return [].slice.apply(eles).filter(function(el) {
+                                var type = el.type;
+                                return el.name && !el.getAttribute('disabled') && rsubmittable.test(el.nodeName) && !rsubmitterTypes.test(type) && (el.checked || !rcheckableType.test(type));
+                            }).map(function(ele) {
+                                var v = ele.value || ele.innerText;
+                                var name = ele.name;
+                                if (ele.type == 'radio') {
+                                    if (!ele.checked) {
+                                        v = '';
+                                    }
+                                }
+                                return !name && !v ? null : { name: ele.name, value: v.replace(rCRLF, "\r\n") };
+                            }).filter(function(x) {
+                                return x.name;
+                            });
+                        }
+                    }, {
+                        key: 'checkMail',
+                        value: function checkMail(mail) {
+                            return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail));
+                        }
+                    }, {
+                        key: 'newPageLoad',
+                        value: function newPageLoad(url, ele, index) {
+                            var w = window.top.screen.width;
+                            var h = window.top.screen.height;
+                            var newPageFixed = document.createElement('div');
+                            newPageFixed.className = 'iframeWapper';
+                            newPageFixed.style.height = h + 'px';
+                            newPageFixed.style.width = w + 'px';
+                            newPageFixed.style.position = 'fixed';
+                            newPageFixed.style.top = '0';
+                            newPageFixed.style.bottom = '0';
+                            newPageFixed.style.left = '100%';
+                            newPageFixed.style.transition = '0.3s ease';
+                            newPageFixed.style.backgroundColor = '#fff';
+                            newPageFixed.style.zIndex = index || 9999;
+                            var iframe = document.createElement('iframe');
+                            iframe.style.border = 'none';
+                            iframe.style.height = h + 'px';
+                            iframe.style.width = w + 'px';
+                            iframe.setAttribute('src', url);
+                            newPageFixed.appendChild(iframe);
+                            ele ? ele.appendChild(newPageFixed) : document.body.appendChild(newPageFixed);
+                            var timer = setInterval(function() {
+                                if (iframe.contentWindow.location.href !== 'about:blank') {
+                                    clearInterval(timer);
+                                    newPageFixed.style.left = 0;
+                                }
+                            }, 30);
+                        }
+                    }, {
+                        key: 'ToOldPage',
+                        value: function ToOldPage(init) {
+                            var theIframe = parent.document.getElementsByTagName('iframe')[0].parentNode;
+                            theIframe.style.left = '100%';
+                            setTimeout(function() {
+                                parent.document.body.removeChild(theIframe);
+                                if (init) {
+                                    parent.init();
+                                }
+                            }, 200);
+                        }
+                    }, {
+                        key: 'layerContent',
+                        value: function layerContent(text) {
+                            layer.open({
+                                shadeClose: false,
+                                content: text,
+                                btn: ['确认']
+                            });
+                        }
+                    }, {
+                        key: 'layerLoading',
+                        value: function layerLoading(text) {
+                            layer.open({
+                                type: 2,
+                                shadeClose: false,
+                                content: text
+                            });
+                        }
+                    }, {
+                        key: 'layerConfirm',
+                        value: function layerConfirm(text, callback) {
+                            layer.open({
+                                shadeClose: false,
+                                content: text,
+                                btn: ['确认', '取消'],
+                                yes: callback
+                            });
+                        }
+                    }]);
+
+                    return tools;
+                }();
+
+                window.__main__ = new tools();
+            })();
+            </script>
+            <script>
+            /*window.onload = function () {
+
+                    var box = document.getElementById('tab-box')
+                    box.style.height = screen.height + 'px'
+                    box.style.overflowY = 'scroll'
+                    box.style.WebKitOverflowY = 'scroll'
+
+                    parent.layer.closeAll()
+                    var tab = document.getElementById('tab-box');
+                    var tabMenu = tab.getElementsByTagName('li');
+                    var tabBox = tab.getElementsByTagName('section');
+
+                    for(var i=0;i<tabMenu.length;i++){
+                        (function(i){
+                            tabMenu[i].onclick = function(e){
+                                for(let c=0;c<tabMenu.length;c++){
+                                    tabMenu[c].className = tabMenu[c].className.replace(' active','');
+                                    tabBox[c].style.display = 'none';
+                                }
+                                this.className += ' active';
+                                tabBox[i].style.display = 'block';
+                                if(!/hasLoad/.test(tabMenu[i].className)){
+                                    __main__.layerLoading('请稍候')
+                                    __main__.XML({
+                                        url : 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'search!doOverviewSearch4Index.AJAX-action?DATA-'+'start=1&limit=10&strWhere='+'北京纳米能源与系统研究所&type=Valid'+'&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=' + '1&key2Save=&keyword2Save=&limit=10&saveFlag=1&strWhere=%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80' + '&type=' + tabMenu[i].getAttribute('data-value')
+                                    }).then(res=>{
+                                        let response = JSON.parse(res)
+                                        if(!response.imgCode){
+                                            tabBox[i].innerHTML = response.html
+                                            tabMenu[i].className += ' hasLoad'
+                                            tabMenu[i].setAttribute('data-more',response.moreData)
+                                            if(response.allCont){
+                                                tabMenu[i].setAttribute('data-all',response.allCont)
+                                            }
+                                            layer.closeAll()
+                                        }else{
+                                            layer.closeAll()
+                                            var imgCode = document.getElementById('imgCode')
+                                            var imgBox = document.getElementById('imgBox')
+                                            imgBox.innerHTML =''
+                                            document.getElementById('inputCode').getElementsByTagName('input')[0].value =''
+                                            var img = document.createElement('img')
+                                            img.setAttribute('src','http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/' + 'RandomCode')
+                                            imgBox.appendChild(img)
+                                            img.addEventListener('click',function(){
+                                                this.setAttribute('src',this.getAttribute('src') +'?nocache=' + new Date().getTime())
+                                            },false)
+                                            img.onload = function(){
+                                                imgCode.style.display = 'block'
+                                            }
+                                            var imgCodeSub = document.getElementById('imgCodeSub')
+                                            imgCodeSub.addEventListener('click',function(e){
+                                                e.stopPropagation()
+                                               var inputCode = document.getElementById('inputCode').getElementsByTagName('input')[0]
+                                                if(!inputCode.value){return}
+                                                __main__.layerLoading('请稍候')
+                                                __main__.XML({
+                                                    url : 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/'+'checkcode.action',
+                                                    method : 'POST',
+                                                    data : response.imgCode.replace('checkCode=','checkCode='+inputCode.value)
+                                                }).then(function(res){
+                                                    layer.closeAll()
+                                                    var r = JSON.parse(res)
+                                                    if(r.success){
+                                                        var iframe = parent.document.querySelector('.iframeWapper iframe')
+                                                        iframe.setAttribute('src',iframe.getAttribute('src') + '&timer=' + new Date().getTime());
+
+                                                        parent.__main__.layerLoading('重新加载')
+
+                                                        var timer = setInterval(function(){
+                                                            if(iframe.contentWindow.location.href !== 'about:blank'){
+                                                                clearInterval(timer)
+                                                                var frameDocument = iframe.contentDocument
+                                                                frameDocument.addEventListener('DOMContentLoaded',function(){
+                                                                    layer.closeAll()
+                                                                    parent.layer.closeAll()
+                                                                },false)
+                                                            }
+                                                        },30)
+                                                    }else{
+                                                        img.click()
+                                                        inputCode.value =''
+                                                        __main__.layerContent('验证码有误')
+                                                    }
+                                                }).catch(e=>{console.log(e);layer.closeAll()})
+                                            })
+                                        }
+                                    }).catch(e=>{layer.closeAll();__main__.layerContent(e)})
+                                }
+                                document.querySelector('.content').scrollTop = 0;
+                            }       
+                        })(i)
+                    }
+                    if('155' == 'hide'){
+                        document.querySelector('.tab-menu').style.display = 'none'
+                        document.querySelector('#tab-box').style.paddingTop = '0.8rem'
+                    }
+                    if(''){
+                        var imgCode = document.getElementById('imgCode')
+                        var imgBox = document.getElementById('imgBox')
+                        var img = document.createElement('img')
+                        imgBox.innerHTML =''
+                        document.getElementById('inputCode').getElementsByTagName('input')[0].value =''
+                        img.setAttribute('src','http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/' + 'RandomCode')
+                        imgBox.appendChild(img)
+                        img.addEventListener('click',function(){
+                            img.setAttribute('src',img.getAttribute('src') +'?nocache=' + new Date().getTime())
+                        },false)
+                        img.onload = function(){
+                            imgCode.style.display = 'block'
+                        }
+                        var imgCodeSub = document.getElementById('imgCodeSub')
+                        imgCodeSub.addEventListener('click',function(e){
+                            e.stopPropagation()
+                            var inputCode = document.getElementById('inputCode').getElementsByTagName('input')[0]
+                            if(!inputCode.value){return}
+                            __main__.layerLoading('请稍候')
+                            __main__.XML({
+                                url : 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/'+'checkcode.action',
+                                method : 'POST',
+                                data :''.replace('checkCode=','checkCode='+inputCode.value)
+                            }).then(function(res){
+                                layer.closeAll()
+                                var r = JSON.parse(res)
+                                if(r.success){
+                                    var iframe = parent.document.querySelector('.iframeWapper iframe')
+                                    iframe.setAttribute('src',iframe.getAttribute('src') + '&timer=' + new Date().getTime());
+
+                                    parent.__main__.layerLoading('重新加载')
+
+                                    var timer = setInterval(function(){
+                                        if(iframe.contentWindow.location.href !== 'about:blank'){
+                                            clearInterval(timer)
+                                            var frameDocument = iframe.contentDocument
+                                            frameDocument.addEventListener('DOMContentLoaded',function(){
+                                                layer.closeAll()
+                                                parent.layer.closeAll()
+                                            },false)
+                                        }
+                                    },30)
+                                }else{
+                                    img.click()
+                                    inputCode.value =''
+                                    __main__.layerContent('验证码有误')
+                                }
+                            }).catch(e=>{console.log(e);layer.closeAll()})
+                        })
+                    }
+                }
+                function loadMore(){
+                    var active = document.querySelector('.active')
+                    var hasType = false
+                    if(parseInt(active.innerText.match(/\d+/)) < 11)  return
+                    if(active.innerText.match(/\d+/))  hasType = true
+                    var data = active.getAttribute('data-more')
+                    var maxPage = active.getAttribute('data-all') ? parseInt(parseInt(active.getAttribute('data-all')) / 10) : parseInt(parseInt(active.innerText.match(/\d+/)) /10)
+                    var nextPage = Math.min(parseInt(active.getAttribute('data-start')) + 1, parseInt(maxPage))
+                    console.log(data.replace(/start=.*?&/,'start='+nextPage+'&'))
+                    __main__.layerLoading('加载更多')
+                    __main__.XML({
+                        url : 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'search!doOverviewSearch.action' +'?keyword=北京纳米能源与系统研究所&type=Valid&type='+active.getAttribute('data-value')+'&hasType=' + hasType,
+                        method : 'POST',
+                        data : data.replace(/start=.*?&/,'start='+nextPage+'&')
+                    }).then(res=>{
+                        layer.closeAll()
+                        active.setAttribute('data-start',Math.min(maxPage,parseInt(active.getAttribute('data-start')) + 1))
+                        let response = JSON.parse(res)
+                        let target = document.getElementById(active.getAttribute('data-value'))
+                        target.innerHTML += response.html
+                    }).catch(e=>{layer.closeAll();__main__.layerContent(e)})
+                }*/
+            'use strict';
+            
+            var content = document.querySelector('.content')
+
+            if ('155' == 'hide') {
+                document.querySelector('.tab-menu').style.display = 'none';
+                document.querySelector('#tab-box').style.paddingTop = '0.8rem';
+
+                var h = screen.height - Math.min(screen.width,640) / 6 * 0.8
+
+                content.style.height = h + 'px'
+            }else{
+                var h1 = screen.height - Math.min(screen.width,640) / 6 * 1.5
+
+                content.style.height = h1 + 'px'
+            }
+
+            window.onload = function() {
+
+                parent.layer.closeAll();
+
+                var tab = document.querySelector('#tab-box');
+                var tabMenu = tab.getElementsByTagName('li');
+                var tabBox = tab.getElementsByTagName('section');
+                for (var i = 0; i < tabMenu.length; i++) {
+                    (function(i) {
+                        tabMenu[i].onclick = function(e) {
+                            for (var c = 0; c < tabMenu.length; c++) {
+                                tabMenu[c].className = tabMenu[c].className.replace(' active', '');
+                                tabBox[c].style.display = 'none';
+                            }
+                            this.className += ' active';
+                            tabBox[i].style.display = 'block';
+                            if (!/hasLoad/.test(tabMenu[i].className)) {
+                                __main__.layerLoading('请稍候');
+                                __main__.XML({
+                                    url: 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'search!doOverviewSearch4Index.AJAX-action?DATA-' + 'start=1&limit=10&strWhere=' + '北京纳米能源与系统研究所&type=Valid' + '&yuyijs=&saveFlag=1&keyword2Save=&key2Save=&dbScope=' + '1&key2Save=&keyword2Save=&limit=10&saveFlag=1&strWhere=%E5%8C%97%E4%BA%AC%E7%BA%B3%E7%B1%B3%E8%83%BD%E6%BA%90%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%A0%94%E7%A9%B6%E6%89%80' + '&type=' + tabMenu[i].getAttribute('data-value')
+                                }).then(function(res) {
+                                    var response = JSON.parse(res);
+                                    if (!response.imgCode) {
+                                        tabBox[i].innerHTML = response.html;
+                                        tabMenu[i].className += ' hasLoad';
+                                        tabMenu[i].setAttribute('data-more', response.moreData);
+                                        if (response.allCont) {
+                                            tabMenu[i].setAttribute('data-all', response.allCont);
+                                        }
+                                        layer.closeAll();
+                                    } else {
+                                        layer.closeAll();
+                                        var imgCode = document.getElementById('imgCode');
+                                        var imgBox = document.getElementById('imgBox');
+                                        imgBox.innerHTML = '';
+                                        document.getElementById('inputCode').getElementsByTagName('input')[0].value = '';
+                                        var img = document.createElement('img');
+                                        img.setAttribute('src', 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/' + 'RandomCode');
+                                        imgBox.appendChild(img);
+                                        img.addEventListener('click', function() {
+                                            this.setAttribute('src', this.getAttribute('src') + '?nocache=' + new Date().getTime());
+                                        }, false);
+                                        img.onload = function() {
+                                            imgCode.style.display = 'block';
+                                        };
+                                    }
+                                }).catch(function(e) {
+                                    layer.closeAll();
+                                    __main__.layerContent(e);
+                                });
+                            }
+                            document.querySelector('.content').scrollTop = 0;
+                        };
+                    })(i);
+                }
+                if (``) {
+                    var imgCode = document.getElementById('imgCode');
+                    var imgBox = document.getElementById('imgBox');
+                    var img = document.createElement('img');
+                    imgBox.innerHTML = '';
+                    document.getElementById('inputCode').getElementsByTagName('input')[0].value = '';
+                    img.setAttribute('src', 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/' + 'RandomCode');
+                    imgBox.appendChild(img);
+                    img.addEventListener('click', function() {
+                        img.setAttribute('src', img.getAttribute('src') + '?nocache=' + new Date().getTime());
+                    }, false);
+                    img.onload = function() {
+                        imgCode.style.display = 'block';
+                    };
+                }
+            };
+
+            function init(){
+                var img = document.querySelector('#imgBox img')
+                var inputCode = document.getElementById('inputCode').getElementsByTagName('input')[0];
+                if (!inputCode.value) {
+                    return;
+                }
+                __main__.layerLoading('请稍候');
+                __main__.XML({
+                    url: 'http://m.cnipr.com:8081/tailor/http://192.168.201.132:8080/' + 'checkcode.action',
+                    method: 'POST',
+                    data: decodeURIComponent(''.replace('checkCode=', 'checkCode=' + inputCode.value))
+                }).then(function(res) {
+                    layer.closeAll();
+                    var r = JSON.parse(res);
+                    if (r.success) {
+                        var iframe = parent.document.querySelector('.iframeWapper iframe');
+                        iframe.setAttribute('src', iframe.getAttribute('src') + '&timer=' + new Date().getTime());
+
+                        parent.__main__.layerLoading('重新加载');
+
+                        var timer = setInterval(function() {
+                            if (iframe.contentWindow.location.href !== 'about:blank') {
+                                clearInterval(timer);
+                                var frameDocument = iframe.contentDocument;
+                                frameDocument.addEventListener('DOMContentLoaded', function() {
+                                    layer.closeAll();
+                                    parent.layer.closeAll();
+                                }, false);
+                            }
+                        }, 30);
+                    } else {
+                        img.click();
+                        inputCode.value = '';
+                        __main__.layerContent('验证码有误');
+                    }
+                }).catch(function(e) {
+                    console.log(e);
+                    layer.closeAll();
+                });
+            }
+
+            function loadMore() {
+                var active = document.querySelector('.active');
+                var hasType = false;
+                if (parseInt(active.innerText.match(/\d+/)) < 11) return;
+                if (active.innerText.match(/\d+/)) hasType = true;
+                var maxPage = active.getAttribute('data-all') ? parseInt(parseInt(active.getAttribute('data-all')) / 10 + 1) : parseInt(parseInt(active.innerText.match(/\d+/)) / 10 + 1);
+                if(parseInt(active.getAttribute('data-start')) == maxPage){
+                    return
+                }
+                var data = active.getAttribute('data-more');
+                var nextPage = Math.min(parseInt(active.getAttribute('data-start')) + 1, parseInt(maxPage));
+                console.log(data.replace(/start=.*?&/, 'start=' + nextPage + '&'));
+                var checkAction = 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'login!checkLogin.action?randomNum=' + Math.random();
+                __main__.layerLoading('加载更多');
+                __main__.XML({
+                    url : checkAction
+                })
+                .then(function(res){
+                    var r = JSON.parse(res)
+                    return r.success
+                })
+                .then(function(success){
+                    if(success){
+                        __main__.XML({
+                        url: 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'search!doOverviewSearch.action' + '?keyword=北京纳米能源与系统研究所&type=Valid&type=' + active.getAttribute('data-value') + '&hasType=' + hasType,
+                        method: 'POST',
+                        data: data.replace(/start=.*?&/, 'start=' + nextPage + '&')
+                        })
+                        .then(function(res){
+                            layer.closeAll();
+                            active.setAttribute('data-start', Math.min(maxPage, parseInt(active.getAttribute('data-start')) + 1));
+                            var response = JSON.parse(res);
+                            var target = document.getElementById(active.getAttribute('data-value'));
+                            target.innerHTML += response.html;
+                        }).catch(function(e) {
+                            layer.closeAll();
+                            __main__.layerLoading('服务器响应超时,请稍后再试')
+                        });
+                    }else{
+                        __main__.layerConfirm('登录超时,请重新登录',function(){
+                            window.location.href = 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'LoginAndRegister.jst';
+                        })
+                    }
+                })
+                .catch(function(e) {
+                    layer.closeAll();
+                    __main__.layerLoading('服务器响应超时,请稍后再试')
+                });
+            }
+            function viewDetail(i, data, ele) {
+                var startPage = document.querySelector('.active').getAttribute('data-start')
+                var targetNum = (startPage - 1) * 10 + i;
+                var url = 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'search!doDetailSearch.action'
+                var post = data.replace(/start=.*?&/, 'start=' + startPage + '&').replace(/recordCursor=.*?&/, 'recordCursor=' + targetNum + '&')
+                var title = ele.getElementsByTagName('h5')[0].innerText
+
+
+                var checkAction = 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'login!checkLogin.action?randomNum=' + Math.random();
+                __main__.layerLoading('请稍候')
+                __main__.XML({
+                    url : checkAction
+                }).then(function(res){
+                    var r = JSON.parse(res)
+                    return r.success
+                }).then(function(success){
+                    if(success){
+                        __main__.newPageLoad(url + '?Data=' + post + '&title=' + title + '&keyword=北京纳米能源与系统研究所&type=Valid')
+                    }else{
+                        __main__.layerConfirm('登录超时,请重新登录',function(){
+                                window.location.href = 'http://m.cnipr.com:8081/tailor/' + 'http://192.168.201.132:8080/' + 'LoginAndRegister.jst';
+                        })
+                    }
+                }).catch(function(e){
+                    layer.closeAll()
+                    __main__.layerLoading('服务器响应超时,请稍后再试')
+                })
+            }
+            /*if(navigator && /iPhone/.test(navigator.appVersion)){
+                content.style.height = screen.height -200 + 'px'
+            }else{
+                content.style.height = screen.height -100 + 'px'
+            }*/
+            var touchstart_Y = 0;
+            var touchMove_Y = 0;
+            var isBottom = false;
+            var isFirstBottom = true;
+            content.addEventListener('touchstart', function(e) {
+                touchstart_Y = e.touches[0].pageY;
+                touchMove_Y = 0;
+                isBottom = content.scrollTop != 0 && (content.scrollTop + document.documentElement.clientHeight) > content.scrollHeight * .9
+            }, false)
+            content.addEventListener('touchmove', function(e) {
+                touchMove_Y = e.touches[0].pageY - touchstart_Y
+            }, false)
+            content.addEventListener('touchend', function() {
+                if (isFirstBottom && isBottom) return isFirstBottom = false;
+                if (!isFirstBottom && 　isBottom && touchMove_Y <= -40) {
+                    isFirstBottom = true;
+                    loadMore()
+                } else if (touchMove_Y >= 30) {
+                    isFirstBottom = true;
+                }
+            }, false)
+            </script>
+    </body>
+
+</html>
