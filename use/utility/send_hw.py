@@ -11,7 +11,7 @@ sys.path.append(path)
 sys.path.append(base_path)
 sys.path.append(father_path)
 
-from app.utils.info import rc, etl
+from info import rc, etl
 
 
 def send_key(key):

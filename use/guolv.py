@@ -1,4 +1,5 @@
-from use.utility.info import etl, kaifa
+
+from utility.info import etl, kaifa
 
 sql_che = """select comp_id from comp_list_chelianwang"""
 cur_che = kaifa.cursor()
