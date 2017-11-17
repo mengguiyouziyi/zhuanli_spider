@@ -33,7 +33,8 @@ sql_in = """insert into zhuanli_shenqing_che (only_id, comp_full_name, shengqing
 for j, d in enumerate(zhuanli_dicts):
 	print('cha ', j)
 	if len(aux_che) == 500:
-		cur_zhuanli.executemany(sql_in, aux_che)
+		args = [(one['only_id'], one['comp_full_name'], one['shengqingliang']) for one in aux_che]
+		cur_zhuanli.executemany(sql_in, args)
 		etl.commit()
 		aux_che.clear()
 	else:
