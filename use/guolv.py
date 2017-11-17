@@ -12,7 +12,7 @@ zhuanli_dicts = []
 for i, r_che in enumerate(results_che):
 	print('zhao ', i)
 	if len(aux) == 500:
-		sql_zhuanli = """select only_id, comp_full_name, shengqingliang from zhuanli_shenqing_comp where comp_id in {ids}""".format(
+		sql_zhuanli = """select only_id, comp_full_name, shengqingliang from zhuanli_shenqing_comp where only_id in {ids}""".format(
 			ids=str(tuple(aux)))
 		cur_zhuanli.execute(sql_zhuanli)
 		results_zhuanli = cur_zhuanli.fetchall()
