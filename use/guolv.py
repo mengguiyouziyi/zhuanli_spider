@@ -21,7 +21,7 @@ for i, r_che in enumerate(results_che):
 	else:
 		aux.append(r_che['comp_id'])
 		continue
-sql_zhuanli = """select only_id, comp_full_name, shengqingliang from zhuanli_shenqing_comp where comp_id in {ids}""".format(
+sql_zhuanli = """select only_id, comp_full_name, shengqingliang from zhuanli_shenqing_comp where only_id in {ids}""".format(
 	ids=str(tuple(aux)))
 cur_zhuanli.execute(sql_zhuanli)
 results_zhuanli = cur_zhuanli.fetchall()
