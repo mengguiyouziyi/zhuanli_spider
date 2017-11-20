@@ -11,10 +11,10 @@ startup_nodes = [{"host": "172.29.237.209", "port": "7000"},
                  {"host": "172.29.237.215", "port": "7006"},
                  {"host": "172.29.237.215", "port": "7007"},
                  {"host": "172.29.237.215", "port": "7008"}]
-rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+# rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 
 # etl
-etl_conf = {'host': '172.31.215.38', 'port': 3306, 'user': 'base', 'password': 'imkloKuLiqNMc6Cn', 'charset': 'utf8mb4',
+etl_conf = {'host': '172.31.215.44', 'port': 3306, 'user': 'base', 'password': 'imkloKuLiqNMc6Cn', 'charset': 'utf8mb4',
             'cursorclass': pymysql.cursors.DictCursor}
 etl = pymysql.connect(**etl_conf)
 etl.select_db('spider')

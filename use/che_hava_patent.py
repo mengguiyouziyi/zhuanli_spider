@@ -1,4 +1,6 @@
-
+"""
+车联网中有专利的公司
+"""
 from utility.info import etl, kaifa
 
 sql_che = """select comp_id from comp_list_chelianwang"""

@@ -43,13 +43,14 @@ DOWNLOAD_DELAY = 3
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-# COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # DEBUG INFO WARNING ERROR CRITICAL
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'DEBUG'
 
 LOG_STDOUT = True
 
+COOKIES_DEBUG = True
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
 
@@ -116,7 +117,7 @@ USER_AGENT_CHOICES = [
 DOWNLOADER_MIDDLEWARES = {
 	# 'cnipr.middlewares.ProxyMiddleware': 1,
 	'cnipr.middlewares.RetryMiddleware': 110,
-	'cnipr.middlewares.RotateUserAgentMiddleware': 3,
+	# 'cnipr.middlewares.RotateUserAgentMiddleware': 3,
 	# 'cnipr.middlewares.BloomfilterMiddleware': 2,
 	# 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
 }
