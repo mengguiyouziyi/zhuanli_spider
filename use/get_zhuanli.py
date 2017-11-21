@@ -220,7 +220,7 @@ def main():
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		if id < 512771:
+		if id < 556538:
 			continue
 		response = get_res(token, result, 1)
 		if response == -1:
@@ -240,9 +240,10 @@ def main():
 			print('program over...')
 			sys.exit(1)
 		except Exception as e:
-
 			if '1366, "Incorrect string value' in e.__str__():
 				print(id, '~~Incorrect string value~~', 1, datetime.now())
+			elif '(1406, "Data too long' in e.__str__():
+				print(id, '~~Data too long~~', 1, datetime.now())
 			else:
 				print(id, '~~unknow error~~', 1, datetime.now())
 				print(e)
@@ -324,7 +325,7 @@ if __name__ == '__main__':
 
 
 """各种错误
-
+(1406, "Data too long for column 'apo' at row 16")
 (1366, "Incorrect string value: '\\xF2\\xB5\\xB0\\xB0\\xD7\\xBB...' for column 'abso' at row 14")
 
 {'context': None, 'errorDesc': '错误代码[9999] ==> 超出接口调用次数限制', 'errorCode': '9999'}
