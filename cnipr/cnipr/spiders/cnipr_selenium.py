@@ -287,7 +287,7 @@ class TouzishijianSpider(scrapy.Spider):
 						author_pdf_url = pdf_url
 				abs_pic = select.xpath('//*[@id="gallery"]/a/@href').extract_first()
 				abs_pic = abs_pic if 'images/ganlan_pic1.gif' != abs_pic else ''
-
+			print(paramAn)
 			item['familyid'] = familyid if familyid else -1
 			item['paramAn'] = paramAn if paramAn else ''
 			item['paramPn'] = paramPn if paramPn else ''
@@ -393,7 +393,7 @@ class TouzishijianSpider(scrapy.Spider):
 					author_pdf_url = pdf_url
 			abs_pic = select.xpath('//*[@id="gallery"]/a/@href').extract_first()
 			abs_pic = abs_pic if 'images/ganlan_pic1.gif' != abs_pic else ''
-
+			print(paramAn)
 			item['familyid'] = familyid if familyid else -1
 			item['paramAn'] = paramAn if paramAn else ''
 			item['paramPn'] = paramPn if paramPn else ''
@@ -440,8 +440,7 @@ class TouzishijianSpider(scrapy.Spider):
 				'strSources': paramDB
 			}
 			yield scrapy.Request(shouquan_url, method='POST', body=shouquan, headers=self.headers,
-			                     cookies=self.cookie_dict,
-			                     callback=self.parse_shouquan, meta={'item': item})
+			                     cookies=self.cookie_dict, callback=self.parse_shouquan, meta={'item': item})
 
 	def parse_shouquan(self, response):
 		"""授权信息"""
