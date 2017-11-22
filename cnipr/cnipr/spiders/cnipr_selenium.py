@@ -19,11 +19,10 @@ class TouzishijianSpider(scrapy.Spider):
 	}
 
 	def __init__(self):
-		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
-		# self.browser = webdriver.Chrome(
-		# 	executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
-		self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
+		self.browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
+		# self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
 		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
 		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
 		self.user = choice(self.user_list)
@@ -44,10 +43,26 @@ class TouzishijianSpider(scrapy.Spider):
 		return cookie_dict
 
 	def start_requests(self):
-		while True:
-			comp = self.rc.rpop('cnipr_comp')
-			if not comp:
-				raise CloseSpider('no datas')
+		# while True:
+		# 	comp = self.rc.rpop('cnipr_comp')
+		# 	if not comp:
+		# 		raise CloseSpider('no datas')
+		comps = [
+			'1~10347203625134653463~国家电网公司',
+	         '2~15251839184792798233~华为技术有限公司',
+	         '3~ad~中兴通讯股份有限公司',
+	         '4~sdf~三星电子株式会社',
+	         '4~sdf~松下电器产业株式会社',
+	         '4~sdf~浙江大学',
+	         '4~sdf~中国石油化工股份有限公司',
+	         '4~sdf~鸿海精密工业股份有限公司',
+	         '4~sdf~清华大学',
+	         '4~sdf~东南大学',
+	         '4~sdf~上海交通大学',
+	         '4~sdf~鸿富锦精密工业(深圳)有限公司',
+	         '4~sdf~佳能株式会社',
+		]
+		for comp in comps:
 			v_l = comp.split('~')
 			origin_id = v_l[0]
 			only_id = v_l[1]
