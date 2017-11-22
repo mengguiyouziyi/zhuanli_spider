@@ -5,57 +5,57 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import pymysql
 import hashlib
-import time
-# from scrapy.xlib.pydispatch import dispatcher
-# from scrapy import signals
+from scrapy.exceptions import CloseSpider
 from scrapy.exceptions import DropItem
 from cnipr.items import CniprItem
+from util.info import etl
 
 
 class MysqlPipeline(object):
 	def __init__(self):
-		try:
-			self.conn = pymysql.connect(host='172.31.215.38', port=3306, user='spider', password='spider', db='spider',
-			                            charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-		except Exception as e:
-			print(e)
-			time.sleep(2)
-			self.__init__()
+		self.conn = etl
 		self.cursor = self.conn.cursor()
 
-	# self.item_list = []
-	# dispatcher.connect(self.spider_closed, signals.spider_closed)
+	def _get_column(self, tab):
+		"""
+		获取mysql表 字段字符串
+		:param con:
+		:param table_in:
+		:return:
+		"""
+		sql = """select group_concat(column_name) from information_schema.columns WHERE table_name = '{tab}' and table_schema = 'spider'""".format(
+			tab=tab)
+		self.cursor.execute(sql)
+		results = self.cursor.fetchall()
+		col_str = results[0]['group_concat(column_name)']
+		col_list = col_str.split(',')
+		return col_list
 
-	# def __init__(self):
-	#     self.browser = webdriver.Chrome(executable_path="D:/Temp/chromedriver.exe")
-	#     super(JobboleSpider, self).__init__()
-	#     dispatcher.connect(self.spider_closed, signals.spider_closed)
-	#
-	# def spider_closed(self, spider):
-	# 	# 当爬虫退出的时候关闭chrome
-	# 	print("spider closed")
-	# 	sql = """insert into jianjie_shunqi_all_copy (comp_url, comp_name, intro, city) VALUES(%s, %s, %s, %s)"""
-	# 	self.cursor.executemany(sql, self.item_list)
-	# 	self.conn.commit()
-	# 	print('%s insert' % len(self.item_list))
+	def _handle_str(self, num):
+		"""
+		根据插入字段数量来构造sql语句
+		:param num: 插入字段数量
+		:return: sql的value字符串
+		"""
+		x = "%s"
+		y = ", %s"
+		for i in range(num - 1):
+			x += y
+		return x
 
 	def process_item(self, item, spider):
 		if isinstance(item, CniprItem):
-			sql = """insert into jianjie_shunqi_all (comp_url, comp_name, intro, city) VALUES(%s, %s, %s, %s)"""
-			args = [item['comp_url'], item['comp_name'], item['intro'], item['city']]
-			self.cursor.execute(sql, args)
-			self.conn.commit()
-		# print(str(item['comp_url']) + ' ' + str(item['comp_name']))
-		# if len(self.item_list) == 500:
-		# 	sql = """insert into jianjie_shunqi_all_copy (comp_url, comp_name, intro, city) VALUES(%s, %s, %s, %s)"""
-		# 	self.cursor.executemany(sql, self.item_list)
-		# 	self.conn.commit()
-		# 	self.item_list.clear()
-		# 	print('200 insert')
-		# else:
-		# 	self.item_list.append([item['comp_url'], item['comp_name'], item['intro'], item['city']])
+			col_list = self._get_column('patent_cnipr_all')[1:-1]
+			col_str = ','.join(col_list)
+			val_str = self._handle_str(len(col_list))
+			sql = """insert into patent_cnipr_all ({col}) VALUES ({val})""".format(col=col_str, val=val_str)
+			args = [item[i] for i in col_list]
+		else:
+			raise CloseSpider('no item match...')
+		self.cursor.execute(sql, args)
+		self.conn.commit()
+		print(item['title'])
 
 
 class DuplicatesPipeline(object):
