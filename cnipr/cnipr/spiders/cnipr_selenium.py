@@ -45,7 +45,7 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def start_requests(self):
 		while True:
-			comp = self.rc.spop('cnipr_comp')
+			comp = self.rc.rpop('cnipr_comp')
 			if not comp:
 				raise CloseSpider('no datas')
 			v_l = comp.split('~')
