@@ -11,15 +11,18 @@ sys.path.append(path)
 sys.path.append(base_path)
 sys.path.append(father_path)
 
-from info import rc, etl
+from info import startup_nodes, etl
+from rediscluster import StrictRedisCluster
 
 
 def send_key(key):
+	rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 	cursor = etl.cursor()
-	sql = """select soft_id from hw_app ORDER BY soft_id"""
+	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp"""
 	cursor.execute(sql)
 	results = cursor.fetchall()
-	values = [str(result['soft_id']) for result in results if result['soft_id']]
+	values = [str(result['id']) + '~' + str(result['only_id']) + '~' + str(result['comp_full_name']) for result in
+	          results]
 	if values:
 		for i, value in enumerate(values):
 			rc.lpush(key, value)
@@ -27,4 +30,4 @@ def send_key(key):
 
 
 if __name__ == '__main__':
-	send_key(key='id_hw')
+	send_key(key='cnipr_comp')

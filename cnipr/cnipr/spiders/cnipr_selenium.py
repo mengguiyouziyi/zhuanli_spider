@@ -7,6 +7,9 @@ from random import random
 from selenium import webdriver
 from selenium.webdriver.common.alert import Alert
 from cnipr.items import CniprItem
+from util.info import startup_nodes
+from rediscluster import StrictRedisCluster
+from scrapy.exceptions import CloseSpider
 
 
 class TouzishijianSpider(scrapy.Spider):
@@ -16,18 +19,19 @@ class TouzishijianSpider(scrapy.Spider):
 	}
 
 	def __init__(self):
+		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
 		self.browser = webdriver.Chrome(
 			executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
+		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
+		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
+		self.user = choice(self.user_list)
 		self.cookie_dict = self.login()
-		self.user = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
-		             {'username': 'mengguiyouziyi', 'password': '3646287'}]
 
 	def login(self):
-		user = choice(self.user)
 		self.browser.get('http://search.cnipr.com/login.action')
-		self.browser.find_element_by_name('username').send_keys(user['username'])
-		self.browser.find_element_by_name('password').send_keys(user['password'])
+		self.browser.find_element_by_name('username').send_keys(self.user['username'])
+		self.browser.find_element_by_name('password').send_keys(self.user['password'])
 		self.browser.find_element_by_xpath('//input[@type="submit"]').click()
 		time.sleep(1)
 		Alert(self.browser).accept()
@@ -38,41 +42,83 @@ class TouzishijianSpider(scrapy.Spider):
 		return cookie_dict
 
 	def start_requests(self):
-		item = CniprItem()
-		gongkai_url = 'http://search.cnipr.com/search!doDetailSearch.action'
-		gongkai = 'strWhere=%(where)s&recordCursor=%(cursor)s&iOption=&iHitPointType=115&strSortMethod=RELEVANCE&strSources=%(sources)s&strSynonymous=&yuyijs=&otherWhere=&gotolight=' % {
-			'where': '申请（专利权）人=(中国石油化工股份有限公司)',
-			'sources': self.sources,
-			'cursor': '53517',
-		}
-		item['origin_id'] = '2'
-		item['only_id'] = 'only_id'
-		item['comp_full_name'] = '中国石油化工股份有限公司'
-		item['cursorPage'] = '53517'
-		item['tifvalue'] = ''
-		item['xmlvalue'] = ''
-		item['pdfvalue'] = ''
-		item['pdfvalue2'] = ''
-		item['patentStatus'] = ''
-		item['claim'] = ''
-		item['description'] = ''
-		yield scrapy.Request(gongkai_url, method='POST', body=gongkai, headers=self.headers, cookies=self.cookie_dict,
-		                     callback=self.parse, meta={'item': item})
-
-	def _solSpace(self, s):
-		return s.strip().replace('\t', '').replace('\r', '').replace('\n', '')
-
-	def _uniteList(self, vl, sep='; '):
-		vl_1 = sep.join([self._solSpace(v) for v in vl if v]) if vl else ''
-		return vl_1
-
-	def _hanWu(self, sep, vl):
-		vl_1 = sep.join([self._solSpace(v) for v in vl if v]) if vl else ''
-		vl_2 = vl_1 if '无' != vl_1 else ''
-		return vl_2
+		while True:
+			comp = self.rc.spop('cnipr_comp')
+			if not comp:
+				raise CloseSpider('no datas')
+			v_l = comp.split('~')
+			origin_id = v_l[0]
+			only_id = v_l[1]
+			comp_full_name = v_l[2]
+			item = CniprItem()
+			gongkai_url = 'http://search.cnipr.com/search!doDetailSearch.action'
+			gongkai = 'strWhere=%(where)s&recordCursor=%(cursor)s&iOption=&iHitPointType=115&strSortMethod=RELEVANCE&strSources=%(sources)s&strSynonymous=&yuyijs=&otherWhere=&gotolight=' % {
+				'where': '申请（专利权）人=(%s)' % comp_full_name,
+				'sources': self.sources,
+				'cursor': '0',
+			}
+			item['origin_id'] = origin_id
+			item['only_id'] = only_id
+			item['comp_full_name'] = comp_full_name
+			item['cursorPage'] = '0'
+			item['tifvalue'] = ''
+			item['xmlvalue'] = ''
+			item['pdfvalue'] = ''
+			item['pdfvalue2'] = ''
+			item['patentStatus'] = ''
+			item['familyid'] = -1
+			item['paramAn'] = ''
+			item['paramPn'] = ''
+			item['paramPd'] = ''
+			item['paramCount'] = -1
+			item['paramDB'] = ''
+			item['paramPages'] = -1
+			item['sysid'] = ''
+			item['appid'] = ''
+			item['title'] = ''
+			item['abs'] = ''
+			item['zhuquan'] = ''
+			item['applicatDate'] = ''
+			item['mainClassNum'] = ''
+			item['classNum'] = ''
+			item['eurMainClassNum'] = ''
+			item['eurClassNum'] = ''
+			item['rightHolder'] = ''
+			item['inventDesigner'] = ''
+			item['addr'] = ''
+			item['countryCode'] = ''
+			item['agency'] = ''
+			item['agent'] = ''
+			item['examinant'] = ''
+			item['priority'] = ''
+			item['internatApply'] = ''
+			item['internatPub'] = ''
+			item['entryDate'] = ''
+			item['cateClass'] = ''
+			item['certifyDay'] = ''
+			item['caseApply'] = ''
+			item['caseApplyNum'] = ''
+			item['sameDayApply'] = ''
+			item['apply_pdf_url'] = ''
+			item['author_pdf_url'] = ''
+			item['abs_pic'] = ''
+			item['desc_pics'] = ''
+			item['paramPn_shouq'] = ''
+			item['paramPd_shouq'] = ''
+			item['listLegalInfo'] = ''
+			item['sqryzzlList'] = ''
+			item['patentList'] = ''
+			item['claim'] = ''
+			item['description'] = ''
+			yield scrapy.Request(gongkai_url, method='POST', body=gongkai, headers=self.headers,
+			                     cookies=self.cookie_dict, meta={'item': item})
 
 	def parse(self, response):
 		"""公开信息"""
+		item = response.meta.get('item')
+		if '对不起，没有您访问的内容' in response.text:
+			yield item
+			return
 		item = response.meta.get('item')
 		select = scrapy.Selector(text=response.text)
 		familyid = select.xpath('//input[@id="familyid"]/@value').extract_first()  # 70054101
@@ -186,7 +232,6 @@ class TouzishijianSpider(scrapy.Spider):
 					ats = tr.xpath('./td/a')
 					holders = []
 					for at in ats:
-						print('at', at)
 						holder = at.xpath('.//text()').extract()
 						holder = ''.join(holder)
 						holders.append(holder)
@@ -418,8 +463,8 @@ class TouzishijianSpider(scrapy.Spider):
 		item = response.meta.get('item')
 		paramPn = item['paramPn']
 		text = json.loads(response.text)
-		listLegalInfo = text.get('listLegalInfo')  # 列表，是不是可以直接json dumps？
-		legal_dict = {'listLegalInfo': listLegalInfo}
+		listLegalInfo = text.get('listLegalInfo')
+		legal_dict = {'listLegalInfo': listLegalInfo} if listLegalInfo else {}
 		item['listLegalInfo'] = json.dumps(legal_dict)
 		cnReference_url = 'http://search.cnipr.com/reference!getCnReference.action?rd=%(rd)s&patnum=%(patnum)s' % {
 			'rd': random(),
@@ -435,7 +480,7 @@ class TouzishijianSpider(scrapy.Spider):
 		text = json.loads(response.text)
 		dto = text.get('dto')
 		sqryzzlList = dto.get('sqryzzlList', []) if dto else []
-		cn_dict = {'sqryzzlList': sqryzzlList}
+		cn_dict = {'sqryzzlList': sqryzzlList} if sqryzzlList else {}
 		item['sqryzzlList'] = json.dumps(cn_dict)
 		patentList_url = 'http://search.cnipr.com/wordtips!familyPatentSearch.action?rd=%(rd)s&an=%(an)s' % {
 			'rd': random(),
@@ -449,7 +494,7 @@ class TouzishijianSpider(scrapy.Spider):
 		item = response.meta.get('item')
 		text = json.loads(response.text)
 		patentList = text.get('patentList')
-		patentList_dict = {'patentList': patentList}
+		patentList_dict = {'patentList': patentList} if patentList else {}
 		item['patentList'] = json.dumps(patentList_dict)
 		yield item
 
@@ -489,3 +534,15 @@ class TouzishijianSpider(scrapy.Spider):
 	# 	text = json.loads(response.text)
 	# 	xml = text.get('xml')
 	# 	item['description'] = xml
+
+	def _solSpace(self, s):
+		return s.strip().replace('\t', '').replace('\r', '').replace('\n', '')
+
+	def _uniteList(self, vl, sep='; '):
+		vl_1 = sep.join([self._solSpace(v) for v in vl if v]) if vl else ''
+		return vl_1
+
+	def _hanWu(self, sep, vl):
+		vl_1 = sep.join([self._solSpace(v) for v in vl if v]) if vl else ''
+		vl_2 = vl_1 if '无' != vl_1 else ''
+		return vl_2
