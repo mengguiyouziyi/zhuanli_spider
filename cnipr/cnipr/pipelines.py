@@ -9,11 +9,13 @@ import hashlib
 from scrapy.exceptions import CloseSpider
 from scrapy.exceptions import DropItem
 from cnipr.items import CniprItem
-from util.info import etl
+from util.info import etl, startup_nodes
+from rediscluster import StrictRedisCluster
 
 
 class MysqlPipeline(object):
 	def __init__(self):
+		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.conn = etl
 		self.cursor = self.conn.cursor()
 
@@ -53,9 +55,17 @@ class MysqlPipeline(object):
 			args = [item[i] for i in col_list]
 		else:
 			raise CloseSpider('no item match...')
-		self.cursor.execute(sql, args)
-		self.conn.commit()
-		print(item['title'])
+		try:
+			self.cursor.execute(sql, args)
+			self.conn.commit()
+			print(item['title'])
+		except Exception as e:
+			cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+				item['comp_full_name']) + '~' + str(item['cursorPage'])
+			self.rc.lpush('cnipr_mysql_error', cnipr_comp)
+			print(e)
+			print('mysql error，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
+			raise CloseSpider('no datas')
 
 
 class DuplicatesPipeline(object):
