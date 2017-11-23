@@ -4,6 +4,7 @@ import requests
 import json
 from random import choice
 from random import random
+from urllib.parse import urljoin
 from cnipr.items import CniprItem
 from util.info import startup_nodes
 from rediscluster import StrictRedisCluster
@@ -294,8 +295,8 @@ class TouzishijianSpider(scrapy.Spider):
 						case = self._hanWu('', auxs)
 						caseApplyNum = case
 					elif '同日申请' in text:
-						ats = tr.xpath('./a/@href').extract_first()
-						sameDayApply = ats
+						sameday_url = tr.xpath('./td/span/a/@href').extract_first()
+						sameDayApply = urljoin(response.url, sameday_url) if sameday_url else ''
 				pdf_tags = select.xpath('//a[@class="shouquangongbu"]')
 				for pdf in pdf_tags:
 					pdf_text = pdf.xpath('./text()').extract_first()
@@ -400,7 +401,8 @@ class TouzishijianSpider(scrapy.Spider):
 					case = self._hanWu('', auxs)
 					caseApplyNum = case
 				elif '同日申请' in text:
-					sameDayApply = aux
+					sameday_url = tr.xpath('./td/span/a/@href').extract_first()
+					sameDayApply = urljoin(response.url, sameday_url) if sameday_url else ''
 			pdf_tags = select.xpath('//a[@class="shouquangongbu"]')
 			for pdf in pdf_tags:
 				pdf_text = pdf.xpath('./text()').extract_first()
@@ -491,7 +493,7 @@ class TouzishijianSpider(scrapy.Spider):
 		paramPn = item['paramPn']
 		listLegalInfo = text.get('listLegalInfo')
 		legal_dict = {'listLegalInfo': listLegalInfo} if listLegalInfo else {}
-		item['listLegalInfo'] = json.dumps(legal_dict)
+		item['listLegalInfo'] = json.dumps(legal_dict) if legal_dict else ''
 		cnReference_url = 'http://search.cnipr.com/reference!getCnReference.action?rd=%(rd)s&patnum=%(patnum)s' % {
 			'rd': random(),
 			'patnum': paramPn
@@ -513,7 +515,7 @@ class TouzishijianSpider(scrapy.Spider):
 		dto = text.get('dto')
 		sqryzzlList = dto.get('sqryzzlList', []) if dto else []
 		cn_dict = {'sqryzzlList': sqryzzlList} if sqryzzlList else {}
-		item['sqryzzlList'] = json.dumps(cn_dict)
+		item['sqryzzlList'] = json.dumps(cn_dict) if cn_dict else ''
 		patentList_url = 'http://search.cnipr.com/wordtips!familyPatentSearch.action?rd=%(rd)s&an=%(an)s' % {
 			'rd': random(),
 			'an': familyid
@@ -553,7 +555,8 @@ class TouzishijianSpider(scrapy.Spider):
 			return
 		item = response.meta.get('item')
 		shoufeeList = text.get('shoufeeList')
-		item['shoufeeList'] = json.dumps(shoufeeList)
+		shoufeeList_dict = {'shoufeeList': shoufeeList} if shoufeeList else {}
+		item['shoufeeList'] = json.dumps(shoufeeList) if shoufeeList_dict else ''
 		yield item
 
 	# 	paramAn = item['paramAn']
