@@ -7,6 +7,7 @@ def login():
 	payload = {'username': 'mengguiyouziyi', 'password': '3646287'}
 	response = requests.request("POST", login_url, data=payload)
 	print(response.cookies.items())
+	print(dict(response.cookies.items()))
 
 
 if __name__ == '__main__':
