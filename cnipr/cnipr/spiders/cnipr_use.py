@@ -23,8 +23,8 @@ class TouzishijianSpider(scrapy.Spider):
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
 		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.user_list = [
-			{'username': 'wlglzx', 'password': '!QAZ2wsx'},
-			# {'username': 'mengguiyouziyi', 'password': '3646287'}
+			# {'username': 'wlglzx', 'password': '!QAZ2wsx'},
+			{'username': 'mengguiyouziyi', 'password': '3646287'}
 		]
 		self.user = choice(self.user_list)
 		self.cookie_dict = self.login()
