@@ -33,26 +33,26 @@ class TouzishijianSpider(scrapy.Spider):
 			goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd=0.6589196511445976'
 			yield scrapy.Request(goonlogin_url, method='POST', headers=self.headers, body=self.user, callback=self.check_login)
 		else:
-			while True:
-				comp = self.rc.rpop('cnipr_comp')
-				if not comp:
-					raise CloseSpider('no datas')
-			# comps = [
-			# 	'1~10347203625134653463~国家电网公司',
-			# '2~15251839184792798233~华为技术有限公司',
-			# '3~ad~中兴通讯股份有限公司',
-			# '4~sdf~三星电子株式会社',
-			# '4~sdf~松下电器产业株式会社',
-			# '4~sdf~浙江大学',
-			# '4~sdf~中国石油化工股份有限公司',
-			# '4~sdf~鸿海精密工业股份有限公司',
-			# '4~sdf~清华大学',
-			# '4~sdf~东南大学',
-			# '4~sdf~上海交通大学',
-			# '4~sdf~鸿富锦精密工业(深圳)有限公司',
-			# '4~sdf~佳能株式会社',
-			# ]
-			# for comp in comps:
+			# while True:
+			# 	comp = self.rc.rpop('cnipr_comp')
+			# 	if not comp:
+			# 		raise CloseSpider('no datas')
+			comps = [
+				'1~10347203625134653463~国家电网公司',
+			'2~15251839184792798233~华为技术有限公司',
+			'3~ad~中兴通讯股份有限公司',
+			'4~sdf~三星电子株式会社',
+			'4~sdf~松下电器产业株式会社',
+			'4~sdf~浙江大学',
+			'4~sdf~中国石油化工股份有限公司',
+			'4~sdf~鸿海精密工业股份有限公司',
+			'4~sdf~清华大学',
+			'4~sdf~东南大学',
+			'4~sdf~上海交通大学',
+			'4~sdf~鸿富锦精密工业(深圳)有限公司',
+			'4~sdf~佳能株式会社',
+			]
+			for comp in comps:
 			# 	comp = '1~10347203625134653463~国家电网公司'
 				v_l = comp.split('~')
 				origin_id = v_l[0]
