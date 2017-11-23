@@ -26,7 +26,7 @@ class TouzishijianSpider(scrapy.Spider):
 		# self.browser = webdriver.PhantomJS('/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
 		# self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
 		# self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
-		self.browser = webdriver.Firefox()
+		self.browser = webdriver.Firefox('/root/.pyenv/versions/3.5.4/envs/env354/selenium/webdriver/firefox')
 		# self.browser = webdriver.Firefox(executable_path='/Users/menggui/Downloads/geckodriver 3')
 		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
 		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
