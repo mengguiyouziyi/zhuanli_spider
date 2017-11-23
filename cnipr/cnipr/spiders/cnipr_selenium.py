@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import time
+import requests
 import json
 from random import choice
 from random import random
@@ -23,8 +24,9 @@ class TouzishijianSpider(scrapy.Spider):
 		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		# self.browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 		# self.browser = webdriver.PhantomJS('/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
-		# self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
-		self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
+		self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
+		# self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
+		# self.browser = webdriver.Firefox(executable_path='/Users/menggui/Downloads/geckodriver 3')
 		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
 		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
 		self.user = choice(self.user_list)
@@ -39,9 +41,9 @@ class TouzishijianSpider(scrapy.Spider):
 		"""
 		该账号已经在其它地方登录，或上次未正常退出,是否继续登录?
 		"""
-		a = Alert(self.browser)
-		print(a.text)
-		a.accept()
+		# a = Alert(self.browser)
+		# print(a.text)
+		# a.accept()
 		# self.browser.execute_script("window.confirm = function(msg) { return true; }")
 		# self.browser.execute_script("window.confirm = function() { return true; }")
 		# self.browser.find_element_by_xpath("//*[@id='alert']/input").click()
@@ -49,7 +51,7 @@ class TouzishijianSpider(scrapy.Spider):
 		# alteralt.accept()
 		# handles = self.browser.window_handles
 		# self.browser.switch_to.alert().accept()
-		time.sleep(0.5)
+		# time.sleep(0.5)
 		cookie_list = self.browser.get_cookies()
 		self.browser.quit()
 		cookie_dict = {v['name']: v['value'] for v in cookie_list}
