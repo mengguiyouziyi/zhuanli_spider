@@ -50,7 +50,7 @@ LOG_LEVEL = 'DEBUG'
 
 LOG_STDOUT = True
 
-# COOKIES_DEBUG = True
+COOKIES_DEBUG = True
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
 

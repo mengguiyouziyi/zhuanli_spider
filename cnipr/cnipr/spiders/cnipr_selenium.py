@@ -19,10 +19,12 @@ class TouzishijianSpider(scrapy.Spider):
 	}
 
 	def __init__(self):
-		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
+		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		# self.browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
-		self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
+		# self.browser = webdriver.PhantomJS('/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
+		# self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
+		self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
 		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
 		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
 		self.user = choice(self.user_list)
@@ -34,8 +36,19 @@ class TouzishijianSpider(scrapy.Spider):
 		self.browser.find_element_by_name('password').send_keys(self.user['password'])
 		self.browser.find_element_by_xpath('//input[@type="submit"]').click()
 		time.sleep(1)
-		# Alert(self.browser).accept()
-		self.browser.execute_script("window.confirm = function(msg) { return true; }")
+		"""
+		该账号已经在其它地方登录，或上次未正常退出,是否继续登录?
+		"""
+		a = Alert(self.browser)
+		print(a.text)
+		a.accept()
+		# self.browser.execute_script("window.confirm = function(msg) { return true; }")
+		# self.browser.execute_script("window.confirm = function() { return true; }")
+		# self.browser.find_element_by_xpath("//*[@id='alert']/input").click()
+		# alteralt = self.browser.switch_to_alert()
+		# alteralt.accept()
+		# handles = self.browser.window_handles
+		# self.browser.switch_to.alert().accept()
 		time.sleep(0.5)
 		cookie_list = self.browser.get_cookies()
 		self.browser.quit()
@@ -47,22 +60,23 @@ class TouzishijianSpider(scrapy.Spider):
 		# 	comp = self.rc.rpop('cnipr_comp')
 		# 	if not comp:
 		# 		raise CloseSpider('no datas')
-		comps = [
-			'1~10347203625134653463~国家电网公司',
-	         '2~15251839184792798233~华为技术有限公司',
-	         '3~ad~中兴通讯股份有限公司',
-	         '4~sdf~三星电子株式会社',
-	         '4~sdf~松下电器产业株式会社',
-	         '4~sdf~浙江大学',
-	         '4~sdf~中国石油化工股份有限公司',
-	         '4~sdf~鸿海精密工业股份有限公司',
-	         '4~sdf~清华大学',
-	         '4~sdf~东南大学',
-	         '4~sdf~上海交通大学',
-	         '4~sdf~鸿富锦精密工业(深圳)有限公司',
-	         '4~sdf~佳能株式会社',
-		]
-		for comp in comps:
+		# comps = [
+		# 	'1~10347203625134653463~国家电网公司',
+	         # '2~15251839184792798233~华为技术有限公司',
+	         # '3~ad~中兴通讯股份有限公司',
+	         # '4~sdf~三星电子株式会社',
+	         # '4~sdf~松下电器产业株式会社',
+	         # '4~sdf~浙江大学',
+	         # '4~sdf~中国石油化工股份有限公司',
+	         # '4~sdf~鸿海精密工业股份有限公司',
+	         # '4~sdf~清华大学',
+	         # '4~sdf~东南大学',
+	         # '4~sdf~上海交通大学',
+	         # '4~sdf~鸿富锦精密工业(深圳)有限公司',
+	         # '4~sdf~佳能株式会社',
+		# ]
+		# for comp in comps:
+			comp = '1~10347203625134653463~国家电网公司'
 			v_l = comp.split('~')
 			origin_id = v_l[0]
 			only_id = v_l[1]
@@ -132,6 +146,8 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def parse(self, response):
 		"""公开信息"""
+		with open('detail.html', 'w') as f:
+			f.writelines(response.text)
 		item = response.meta.get('item')
 		if '对不起，没有您访问的内容' in response.text:
 			yield item
@@ -241,7 +257,7 @@ class TouzishijianSpider(scrapy.Spider):
 				for tr in tr_tags:
 					text = tr.xpath('./td[@class="tit"]/text()').extract()
 					text = ''.join(text) if text else ''
-					auxs = tr.xpath('./td/span/text()').extract()
+					auxs = tr.xpath('./td/span//text()').extract()
 					aux = self._hanWu('; ', auxs)
 					atexts = tr.xpath('./td/a//text()').extract()
 					atext = self._hanWu('', atexts)
@@ -289,7 +305,8 @@ class TouzishijianSpider(scrapy.Spider):
 					elif '进入国家日期' in text:
 						entryDate = tdtext
 					elif '分案原申请号' in text:
-						caseApplyNum = aux
+						case = self._hanWu('', auxs)
+						caseApplyNum = case
 					elif '同日申请' in text:
 						sameDayApply = aux
 				pdf_tags = select.xpath('//a[@class="shouquangongbu"]')
@@ -302,7 +319,6 @@ class TouzishijianSpider(scrapy.Spider):
 						author_pdf_url = pdf_url
 				abs_pic = select.xpath('//*[@id="gallery"]/a/@href').extract_first()
 				abs_pic = abs_pic if 'images/ganlan_pic1.gif' != abs_pic else ''
-			print(paramAn)
 			item['familyid'] = familyid if familyid else -1
 			item['paramAn'] = paramAn if paramAn else ''
 			item['paramPn'] = paramPn if paramPn else ''
@@ -356,7 +372,7 @@ class TouzishijianSpider(scrapy.Spider):
 			for tr in tr_tags:
 				text = tr.xpath('./td[@class="tit"]/text()').extract()
 				text = ''.join(text) if text else ''
-				auxs = tr.xpath('./td/span/text()').extract()
+				auxs = tr.xpath('./td/span//text()').extract()
 				aux = self._hanWu('; ', auxs)
 				atexts = tr.xpath('./td/a//text()').extract()
 				atext = self._hanWu('', atexts)
@@ -395,7 +411,8 @@ class TouzishijianSpider(scrapy.Spider):
 				elif '进入国家日期' in text:
 					entryDate = tdtext
 				elif '分案原申请号' in text:
-					caseApplyNum = aux
+					case = self._hanWu('', auxs)
+					caseApplyNum = case
 				elif '同日申请' in text:
 					sameDayApply = aux
 			pdf_tags = select.xpath('//a[@class="shouquangongbu"]')
