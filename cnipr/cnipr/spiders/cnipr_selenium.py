@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import time
 import requests
 import json
 from random import choice
 from random import random
-from selenium import webdriver
-from selenium.webdriver.common.alert import Alert
 from cnipr.items import CniprItem
 from util.info import startup_nodes
 from rediscluster import StrictRedisCluster
 from scrapy.exceptions import CloseSpider
-# from pyvirtualdisplay import Display
-
-
 
 
 class TouzishijianSpider(scrapy.Spider):
-	name = 'cnipr_selenium'
+	name = 'cnipr_sele'
 	headers = {
 		'content-type': "application/x-www-form-urlencoded",
 	}
+
+	custom_settings = {
+		'DEFAULT_REQUEST_HEADERS': {
+			'content-type': "application/x-www-form-urlencoded",
+		},
+	}
+
 	def __init__(self):
 		# self.display = Display(visible=0, size=(800, 600))
 		# self.display.start()
@@ -33,17 +34,20 @@ class TouzishijianSpider(scrapy.Spider):
 		# self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
 		# self.browser = webdriver.Firefox('/root/.pyenv/versions/3.5.4/envs/env354/selenium/webdriver/firefox')
 		# self.browser = webdriver.Firefox(executable_path='/Users/menggui/Downloads/geckodriver 3')
-		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
-		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
+		self.user_list = [
+			{'username': 'wlglzx', 'password': '!QAZ2wsx'},
+			# {'username': 'mengguiyouziyi', 'password': '3646287'}
+		]
 		self.user = choice(self.user_list)
 		self.cookie_dict = self.login()
-		# cookies = ['JSESSIONID=BDC62EDE5DB7FDFEA262B78F57932C41; _gscs_719616686=11422950skn8wy11|pv:1; _gscu_719616686=11422950j6mimw11; _gscbrs_719616686=1; _trs_uv=jac678hc_1186_bd8k; _trs_ua_s_1=jac678hc_1186_4bgx']
-		# cookies = ['JSESSIONID=BDC62EDE5DB7FDFEA262B78F57932C41']
-		# self.cookie_dict = dict((line.split('=') for line in choice(cookies).strip().split(";")))
+
+	# cookies = ['JSESSIONID=BDC62EDE5DB7FDFEA262B78F57932C41; _gscs_719616686=11422950skn8wy11|pv:1; _gscu_719616686=11422950j6mimw11; _gscbrs_719616686=1; _trs_uv=jac678hc_1186_bd8k; _trs_ua_s_1=jac678hc_1186_4bgx']
+	# cookies = ['JSESSIONID=BDC62EDE5DB7FDFEA262B78F57932C41']
+	# self.cookie_dict = dict((line.split('=') for line in choice(cookies).strip().split(";")))
 
 	def login(self):
-		login_url = 'http://search.cnipr.com/login.action?rd=0.6589196511445976'
-		goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd=0.6589196511445976'
+		login_url = 'http://search.cnipr.com/login.action?rd={}'.format(random())
+		goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd={}'.format(random())
 		# payloads = 'username=mengguiyouziyi&password=3646287'
 		print(self.user)
 		response = requests.request("POST", login_url, data=self.user)
@@ -86,23 +90,24 @@ class TouzishijianSpider(scrapy.Spider):
 		# 	comp = self.rc.rpop('cnipr_comp')
 		# 	if not comp:
 		# 		raise CloseSpider('no datas')
-		# comps = [
-		# 	'1~10347203625134653463~国家电网公司',
-	         # '2~15251839184792798233~华为技术有限公司',
-	         # '3~ad~中兴通讯股份有限公司',
-	         # '4~sdf~三星电子株式会社',
-	         # '4~sdf~松下电器产业株式会社',
-	         # '4~sdf~浙江大学',
-	         # '4~sdf~中国石油化工股份有限公司',
-	         # '4~sdf~鸿海精密工业股份有限公司',
-	         # '4~sdf~清华大学',
-	         # '4~sdf~东南大学',
-	         # '4~sdf~上海交通大学',
-	         # '4~sdf~鸿富锦精密工业(深圳)有限公司',
-	         # '4~sdf~佳能株式会社',
-		# ]
-		# for comp in comps:
-			comp = '1~10347203625134653463~国家电网公司'
+		comps = [
+			'1~10347203625134653463~国家电网公司',
+			'2~15251839184792798233~华为技术有限公司',
+			'3~ad~中兴通讯股份有限公司',
+			'4~sdf~三星电子株式会社',
+			'4~sdf~松下电器产业株式会社',
+			'4~sdf~浙江大学',
+			'4~sdf~中国石油化工股份有限公司',
+			'4~sdf~鸿海精密工业股份有限公司',
+			'4~sdf~清华大学',
+			'4~sdf~东南大学',
+			'4~sdf~上海交通大学',
+			'4~sdf~鸿富锦精密工业(深圳)有限公司',
+			'4~sdf~中国石油大学(华东)',
+			'4~sdf~佳能株式会社',
+		]
+		for comp in comps:
+			# comp = '1~10347203625134653463~国家电网公司'
 			v_l = comp.split('~')
 			origin_id = v_l[0]
 			only_id = v_l[1]
@@ -110,7 +115,7 @@ class TouzishijianSpider(scrapy.Spider):
 			item = CniprItem()
 			gongkai_url = 'http://search.cnipr.com/search!doDetailSearch.action'
 			gongkai = 'strWhere=%(where)s&recordCursor=%(cursor)s&iOption=&iHitPointType=115&strSortMethod=RELEVANCE&strSources=%(sources)s&strSynonymous=&yuyijs=&otherWhere=&gotolight=' % {
-				'where': '申请（专利权）人=(%s)' % comp_full_name,
+				'where': '申请（专利权）人=(%s)' % comp_full_name.replace('(', r'\(').replace(')', r'\)'),
 				'sources': self.sources,
 				'cursor': '0',
 			}
@@ -167,21 +172,24 @@ class TouzishijianSpider(scrapy.Spider):
 			item['patentList'] = ''
 			item['claim'] = ''
 			item['description'] = ''
-			yield scrapy.Request(gongkai_url, method='POST', body=gongkai, headers=self.headers,
+			yield scrapy.Request(gongkai_url, method='POST', body=gongkai,
 			                     cookies=self.cookie_dict, meta={'item': item})
 
 	def parse(self, response):
 		"""公开信息"""
-		with open('detail.html', 'w') as f:
-			f.writelines(response.text)
 		item = response.meta.get('item')
 		if '对不起，没有您访问的内容' in response.text:
+			print('对不起，没有您访问的内容')
 			yield item
+			return
+		elif '您的操作过于频繁' in response.text:
+			print('您的操作过于频繁')
 			return
 		item = response.meta.get('item')
 		select = scrapy.Selector(text=response.text)
 		familyid = select.xpath('//input[@id="familyid"]/@value').extract_first()  # 70054101
 		paramAn = select.xpath('//input[@id="paramAn"]/@value').extract_first()  # CN201310571770.7  申请(专利)号
+		print(paramAn)
 		paramPn = select.xpath('//input[@id="paramPn"]/@value').extract_first()  # CN104636980A  申请公布号
 		paramPd = select.xpath('//input[@id="paramPd"]/@value').extract_first()  # 2015.05.20  公开公告日
 		paramCount = select.xpath('//input[@id="paramCount"]/@value').extract_first()  # 53434  专利数量
@@ -388,7 +396,7 @@ class TouzishijianSpider(scrapy.Spider):
 				'rd': random(),
 				'strAn': paramAn
 			}
-			yield scrapy.Request(legal_url, headers=self.headers, cookies=self.cookie_dict, callback=self.legal,
+			yield scrapy.Request(legal_url, cookies=self.cookie_dict, callback=self.legal,
 			                     meta={'item': item})
 		else:
 			title = select.xpath('//div[@class="nc_left"]/h3/text()').extract_first()
@@ -451,7 +459,6 @@ class TouzishijianSpider(scrapy.Spider):
 					author_pdf_url = pdf_url
 			abs_pic = select.xpath('//*[@id="gallery"]/a/@href').extract_first()
 			abs_pic = abs_pic if 'images/ganlan_pic1.gif' != abs_pic else ''
-			print(paramAn)
 			item['familyid'] = familyid if familyid else -1
 			item['paramAn'] = paramAn if paramAn else ''
 			item['paramPn'] = paramPn if paramPn else ''
@@ -497,7 +504,7 @@ class TouzishijianSpider(scrapy.Spider):
 				'sources': self.sources,
 				'strSources': paramDB
 			}
-			yield scrapy.Request(shouquan_url, method='POST', body=shouquan, headers=self.headers,
+			yield scrapy.Request(shouquan_url, method='POST', body=shouquan,
 			                     cookies=self.cookie_dict, callback=self.parse_shouquan, meta={'item': item})
 
 	def parse_shouquan(self, response):
@@ -514,7 +521,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'rd': random(),
 			'strAn': paramAn
 		}
-		yield scrapy.Request(legal_url, headers=self.headers, cookies=self.cookie_dict, callback=self.legal,
+		yield scrapy.Request(legal_url, cookies=self.cookie_dict, callback=self.legal,
 		                     meta={'item': item})
 
 	def legal(self, response):
@@ -529,7 +536,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'rd': random(),
 			'patnum': paramPn
 		}
-		yield scrapy.Request(cnReference_url, headers=self.headers, cookies=self.cookie_dict, callback=self.cnReference,
+		yield scrapy.Request(cnReference_url, cookies=self.cookie_dict, callback=self.cnReference,
 		                     meta={'item': item})
 
 	def cnReference(self, response):
@@ -545,7 +552,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'rd': random(),
 			'an': familyid
 		}
-		yield scrapy.Request(patentList_url, headers=self.headers, cookies=self.cookie_dict, callback=self.patentList,
+		yield scrapy.Request(patentList_url, cookies=self.cookie_dict, callback=self.patentList,
 		                     meta={'item': item})
 
 	def patentList(self, response):
@@ -566,7 +573,7 @@ class TouzishijianSpider(scrapy.Spider):
 	# 		'strSource': paramDB,
 	# 		'pd': paramPd,
 	# 	}
-	# 	yield scrapy.Request(quanli_url, headers=self.headers, cookies=self.cookie_dict, callback=self.quanli,
+	# 	yield scrapy.Request(quanli_url, cookies=self.cookie_dict, callback=self.quanli,
 	# 	                     meta={'item': item})
 	#
 	# def quanli(self, response):
@@ -584,7 +591,7 @@ class TouzishijianSpider(scrapy.Spider):
 	# 		'strSource': paramDB,
 	# 		'pd': paramPd,
 	# 	}
-	# 	yield scrapy.Request(shuoming_url, headers=self.headers, cookies=self.cookie_dict, callback=self.shuoming,
+	# 	yield scrapy.Request(shuoming_url, cookies=self.cookie_dict, callback=self.shuoming,
 	# 	                     meta={'item': item})
 	#
 	# def shuoming(self, response):

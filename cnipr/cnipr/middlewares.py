@@ -34,12 +34,12 @@ from scrapy.exceptions import IgnoreRequest, CloseSpider
 # 		else:
 # 			self.bf.add(url)
 
-class CloseMiddleware(object):
-	def process_response(self, request, response, spider):
-		if response.status == 402:
-			raise CloseSpider('402 proxy no use')
-		else:
-			return response
+# class CloseMiddleware(object):
+# 	def process_response(self, request, response, spider):
+# 		if response.status == 402:
+# 			raise CloseSpider('402 proxy no use')
+# 		else:
+# 			return response
 
 
 class ProxyMiddleware(object):
@@ -69,10 +69,19 @@ class RetryMiddleware(object):
 	def process_response(self, request, response, spider):
 		if response.status in [429, 503]:
 			# print('wrong status: %s, retrying~~' % response.status, request.url)
+			print('重试')
 			retryreq = request.copy()
 			retryreq.dont_filter = True
 			return retryreq
 		else:
+			url = response.url
+			if 'doDetailSearch' in url:
+				paramAn = response.xpath('//input[@id="paramAn"]/@value').extract_first()
+				if not paramAn:
+					print('no paramAn, retry')
+					retryreq = request.copy()
+					retryreq.dont_filter = True
+					return retryreq
 			return response
 
 

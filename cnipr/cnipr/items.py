@@ -72,6 +72,7 @@ class CniprItem(scrapy.Item):
 
 	listLegalInfo = scrapy.Field()
 	sqryzzlList = scrapy.Field()
+	patentList = scrapy.Field()
 	claim = scrapy.Field()
 	description = scrapy.Field()
-	patentList = scrapy.Field()
+	shoufeeList = scrapy.Field()
