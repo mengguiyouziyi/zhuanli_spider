@@ -49,23 +49,23 @@ class TouzishijianSpider(scrapy.Spider):
 			comp = self.rc.rpop('cnipr_comp')
 			if not comp:
 				raise CloseSpider('no datas')
-		# comps = [
-		# 	'1~10347203625134653463~国家电网公司',
-		# 	'2~15251839184792798233~华为技术有限公司',
-		# 	'3~ad~中兴通讯股份有限公司',
-		# 	'4~sdf~三星电子株式会社',
-		# 	'4~sdf~松下电器产业株式会社',
-		# 	'4~sdf~浙江大学',
-		# 	'4~sdf~中国石油化工股份有限公司',
-		# 	'4~sdf~鸿海精密工业股份有限公司',
-		# 	'4~sdf~清华大学',
-		# 	'4~sdf~东南大学',
-		# 	'4~sdf~上海交通大学',
-		# 	'4~sdf~鸿富锦精密工业(深圳)有限公司',
-		# 	'4~sdf~中国石油大学(华东)',
-		# 	'4~sdf~佳能株式会社',
-		# ]
-		# for comp in comps:
+			# comps = [
+			# 	'1~10347203625134653463~国家电网公司',
+			# 	'2~15251839184792798233~华为技术有限公司',
+			# 	'3~ad~中兴通讯股份有限公司',
+			# 	'4~sdf~三星电子株式会社',
+			# 	'4~sdf~松下电器产业株式会社',
+			# 	'4~sdf~浙江大学',
+			# 	'4~sdf~中国石油化工股份有限公司',
+			# 	'4~sdf~鸿海精密工业股份有限公司',
+			# 	'4~sdf~清华大学',
+			# 	'4~sdf~东南大学',
+			# 	'4~sdf~上海交通大学',
+			# 	'4~sdf~鸿富锦精密工业(深圳)有限公司',
+			# 	'4~sdf~中国石油大学(华东)',
+			# 	'4~sdf~佳能株式会社',
+			# ]
+			# for comp in comps:
 			# comp = '1~10347203625134653463~国家电网公司'
 			v_l = comp.split('~')
 			origin_id = v_l[0]
@@ -74,7 +74,9 @@ class TouzishijianSpider(scrapy.Spider):
 			item = CniprItem()
 			gongkai_url = 'http://search.cnipr.com/search!doDetailSearch.action'
 			gongkai = 'strWhere=%(where)s&recordCursor=%(cursor)s&iOption=&iHitPointType=115&strSortMethod=RELEVANCE&strSources=%(sources)s&strSynonymous=&yuyijs=&otherWhere=&gotolight=' % {
-				'where': '申请（专利权）人=(%s)' % comp_full_name.replace('(', r'\(').replace(')', r'\)'),
+				'where': '申请（专利权）人=(%s)' % comp_full_name.replace('(', r'\(').replace(')', r'\)').replace('（',
+				                                                                                          r'\（').replace(
+					'）', r'\）'),
 				'sources': self.sources,
 				'cursor': '0',
 			}
@@ -138,19 +140,23 @@ class TouzishijianSpider(scrapy.Spider):
 	def parse(self, response):
 		"""公开信息"""
 		item = response.meta.get('item')
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '对不起，没有您访问的内容' in response.text:
 			print('对不起，没有您访问的内容')
+			self.rc.lpush('cnipr_no_result', cnipr_comp)
 			yield item
 			return
 		elif '您的操作过于频繁' in response.text:
-			print('您的操作过于频繁')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
 		item = response.meta.get('item')
 		select = scrapy.Selector(text=response.text)
 		familyid = select.xpath('//input[@id="familyid"]/@value').extract_first()  # 70054101
 		paramAn = select.xpath('//input[@id="paramAn"]/@value').extract_first()  # CN201310571770.7  申请(专利)号
 		if not paramAn:
-			print('no paramAn....')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('no paramAn，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
 		paramPn = select.xpath('//input[@id="paramPn"]/@value').extract_first()  # CN104636980A  申请公布号
 		paramPd = select.xpath('//input[@id="paramPd"]/@value').extract_first()  # 2015.05.20  公开公告日
@@ -463,10 +469,12 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def parse_shouquan(self, response):
 		"""授权信息"""
-		if '您的操作过于频繁' in response.text:
-			print('您的操作过于频繁')
-			return
 		item = response.meta.get('item')
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		if '您的操作过于频繁' in response.text:
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
+			return
 		paramAn = item['paramAn']
 		select = scrapy.Selector(text=response.text)
 		paramPn_shouq = select.xpath('//input[@id="paramPn"]/@value').extract_first()  # CN104174429B  授权公布号
@@ -481,15 +489,18 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def legal(self, response):
 		"""法律状态"""
+		item = response.meta.get('item')
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			print('您的操作过于频繁')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
 		try:
 			text = json.loads(response.text)
 		except:
-			print('no legal...')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('no legal，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
-		item = response.meta.get('item')
 		paramPn = item['paramPn']
 		listLegalInfo = text.get('listLegalInfo')
 		legal_dict = {'listLegalInfo': listLegalInfo} if listLegalInfo else {}
@@ -502,15 +513,18 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def cnReference(self, response):
 		"""引证文献"""
+		item = response.meta.get('item')
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			print('您的操作过于频繁')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
 		try:
 			text = json.loads(response.text)
 		except:
-			print('no cnReference...')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('no cnReference，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
-		item = response.meta.get('item')
 		familyid = item['familyid']
 		dto = text.get('dto')
 		sqryzzlList = dto.get('sqryzzlList', []) if dto else []
@@ -524,19 +538,22 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def patentList(self, response):
 		"""同族专利"""
+		item = response.meta.get('item')
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			print('您的操作过于频繁')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
 		try:
 			text = json.loads(response.text)
 		except:
-			print('no patentList...')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('no patentList，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
-		item = response.meta.get('item')
 		paramAn = item['paramAn']
 		patentList = text.get('patentList')
 		patentList_dict = {'patentList': patentList} if patentList else {}
-		item['patentList'] = json.dumps(patentList_dict)
+		item['patentList'] = json.dumps(patentList_dict) if patentList_dict else ''
 		shoufei_url = 'http://search.cnipr.com/search!doNianjinByAn.action?rd=%(rd)s&strAn=%(strAn)s' % {
 			'rd': random(),
 			'strAn': paramAn
@@ -545,15 +562,18 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def shoufei(self, response):
 		"""收费信息"""
+		item = response.meta.get('item')
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			print('您的操作过于频繁')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
 		try:
 			text = json.loads(response.text)
 		except:
-			print('no shoufei...')
+			self.rc.lpush('cnipr_fail', cnipr_comp)
+			print('no shoufei，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			return
-		item = response.meta.get('item')
 		shoufeeList = text.get('shoufeeList')
 		shoufeeList_dict = {'shoufeeList': shoufeeList} if shoufeeList else {}
 		item['shoufeeList'] = json.dumps(shoufeeList) if shoufeeList_dict else ''
@@ -607,3 +627,4 @@ class TouzishijianSpider(scrapy.Spider):
 		vl_1 = sep.join([self._solSpace(v) for v in vl if v]) if vl else ''
 		vl_2 = vl_1 if '无' != vl_1 else ''
 		return vl_2
+
