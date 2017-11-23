@@ -122,8 +122,6 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def parse(self, response):
 		"""公开信息"""
-		with open('detail.html', 'w') as f:
-			f.writelines(response.text)
 		item = response.meta.get('item')
 		if '对不起，没有您访问的内容' in response.text:
 			yield item
