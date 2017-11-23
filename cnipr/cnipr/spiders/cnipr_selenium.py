@@ -11,6 +11,9 @@ from cnipr.items import CniprItem
 from util.info import startup_nodes
 from rediscluster import StrictRedisCluster
 from scrapy.exceptions import CloseSpider
+from pyvirtualdisplay import Display
+
+
 
 
 class TouzishijianSpider(scrapy.Spider):
@@ -18,11 +21,13 @@ class TouzishijianSpider(scrapy.Spider):
 	headers = {
 		'content-type': "application/x-www-form-urlencoded",
 	}
-
 	def __init__(self):
+		self.display = Display(visible=0, size=(800, 600))
+		self.display.start()
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
 		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
-		self.browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
+		# self.browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
+		self.browser = webdriver.Chrome(executable_path='/root/.pyenv/versions/3.5.4/bin/chromedriver')
 		# self.browser = webdriver.PhantomJS('/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
 		# self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
 		# self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
@@ -34,6 +39,7 @@ class TouzishijianSpider(scrapy.Spider):
 		self.cookie_dict = self.login()
 
 	def login(self):
+
 		self.browser.get('http://search.cnipr.com/login.action')
 		self.browser.find_element_by_name('username').send_keys(self.user['username'])
 		self.browser.find_element_by_name('password').send_keys(self.user['password'])
@@ -42,10 +48,10 @@ class TouzishijianSpider(scrapy.Spider):
 		"""
 		该账号已经在其它地方登录，或上次未正常退出,是否继续登录?
 		"""
-		# a = Alert(self.browser)
-		# print(a.text)
-		# a.accept()
-		self.browser.execute_script("window.confirm = function(msg) { return true; }")
+		a = Alert(self.browser)
+		print(a.text)
+		a.accept()
+		# self.browser.execute_script("window.confirm = function(msg) { return true; }")
 		# self.browser.execute_script("window.confirm = function() { return true; }")
 		# self.browser.find_element_by_xpath("//*[@id='alert']/input").click()
 		# alteralt = self.browser.switch_to_alert()
@@ -55,6 +61,7 @@ class TouzishijianSpider(scrapy.Spider):
 		# time.sleep(0.5)
 		cookie_list = self.browser.get_cookies()
 		self.browser.quit()
+		self.display.stop()
 		cookie_dict = {v['name']: v['value'] for v in cookie_list}
 		return cookie_dict
 
