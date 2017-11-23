@@ -576,7 +576,7 @@ class TouzishijianSpider(scrapy.Spider):
 			return
 		shoufeeList = text.get('shoufeeList')
 		shoufeeList_dict = {'shoufeeList': shoufeeList} if shoufeeList else {}
-		item['shoufeeList'] = json.dumps(shoufeeList) if shoufeeList_dict else ''
+		item['shoufeeList'] = json.dumps(shoufeeList_dict) if shoufeeList_dict else ''
 		yield item
 
 	# 	paramAn = item['paramAn']
