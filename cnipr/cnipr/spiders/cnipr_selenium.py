@@ -24,8 +24,9 @@ class TouzishijianSpider(scrapy.Spider):
 		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		# self.browser = webdriver.Chrome(executable_path='/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/chromedriver')
 		# self.browser = webdriver.PhantomJS('/Users/menggui/.pyenv/versions/Anaconda3-4.3.0/bin/phantomjs')
-		self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
+		# self.browser = webdriver.PhantomJS(executable_path='/root/.pyenv/versions/3.5.4/bin/phantomjs')
 		# self.browser = webdriver.Firefox(executable_path='/root/.pyenv/versions/3.5.4/bin/geckodriver')
+		self.browser = webdriver.Firefox()
 		# self.browser = webdriver.Firefox(executable_path='/Users/menggui/Downloads/geckodriver 3')
 		self.user_list = [{'username': 'wlglzx', 'password': '!QAZ2wsx'},
 		                  {'username': 'mengguiyouziyi', 'password': '3646287'}]
