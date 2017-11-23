@@ -41,9 +41,9 @@ class TouzishijianSpider(scrapy.Spider):
 		"""
 		该账号已经在其它地方登录，或上次未正常退出,是否继续登录?
 		"""
-		# a = Alert(self.browser)
-		# print(a.text)
-		# a.accept()
+		a = Alert(self.browser)
+		print(a.text)
+		a.accept()
 		# self.browser.execute_script("window.confirm = function(msg) { return true; }")
 		# self.browser.execute_script("window.confirm = function() { return true; }")
 		# self.browser.find_element_by_xpath("//*[@id='alert']/input").click()
