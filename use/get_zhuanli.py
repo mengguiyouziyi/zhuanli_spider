@@ -220,7 +220,7 @@ def main():
 		id = result.get('id')
 		only_id = result.get('only_id')
 		proposer = result.get('comp_full_name')
-		if id < 589667:
+		if id < 629671:
 			continue
 		response = get_res(token, result, 1)
 		if response == -1:
