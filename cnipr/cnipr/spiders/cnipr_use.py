@@ -27,7 +27,7 @@ class TouzishijianSpider(scrapy.Spider):
 			# {'username': 'mengguiyouziyi', 'password': '3646287'}
 		]
 		self.user = choice(self.user_list)
-		self.cookie_dict = self.login()
+		self.cookie_dict = {'JSESSIONID': 'D8D3F9ACDC0DA02D2CC7201A5CACD442'}
 		print(self.cookie_dict)
 
 	def login(self):
