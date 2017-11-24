@@ -18,6 +18,9 @@ class MysqlPipeline(object):
 		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.conn = etl
 		self.cursor = self.conn.cursor()
+		self.col_list = self._get_column('patent_cnipr_all')[1:-1]
+		self.col_str = ','.join(self.col_list)
+		self.val_str = self._handle_str(len(self.col_list))
 
 	def _get_column(self, tab):
 		"""
@@ -28,7 +31,11 @@ class MysqlPipeline(object):
 		"""
 		sql = """select group_concat(column_name) from information_schema.columns WHERE table_name = '{tab}' and table_schema = 'spider'""".format(
 			tab=tab)
-		self.cursor.execute(sql)
+		try:
+			self.cursor.execute(sql)
+		except Exception as e:
+			print(e)
+			raise CloseSpider('获取数据表字段错误....')
 		results = self.cursor.fetchall()
 		col_str = results[0]['group_concat(column_name)']
 		col_list = col_str.split(',')
@@ -48,11 +55,8 @@ class MysqlPipeline(object):
 
 	def process_item(self, item, spider):
 		if isinstance(item, CniprItem):
-			col_list = self._get_column('patent_cnipr_all')[1:-1]
-			col_str = ','.join(col_list)
-			val_str = self._handle_str(len(col_list))
-			sql = """insert into patent_cnipr_all ({col}) VALUES ({val})""".format(col=col_str, val=val_str)
-			args = [item[i] for i in col_list]
+			sql = """insert into patent_cnipr_all ({col}) VALUES ({val})""".format(col=self.col_str, val=self.val_str)
+			args = [item[i] for i in self.col_list]
 		else:
 			raise CloseSpider('no item match...')
 		try:
@@ -65,7 +69,7 @@ class MysqlPipeline(object):
 			self.rc.lpush('cnipr_mysql_error', cnipr_comp)
 			print(e)
 			print('mysql error，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
-			raise CloseSpider('no datas')
+			raise CloseSpider('mysql insert error.....')
 
 
 class DuplicatesPipeline(object):
