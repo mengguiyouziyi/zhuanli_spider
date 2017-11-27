@@ -11,12 +11,10 @@ echo "first time $ID"
 for id in $ID
 do
     kill $id
-    #IDD=`ps -ef | grep "cmd_meng.py" |grep -v "grep"| awk '{print $2}'`
-    #echo "programing $IDD"
     echo "killed $id"
 done
 echo "first sleep 10s..."
-sleep 10
+sleep 25
 
 while true
 do
@@ -27,10 +25,10 @@ do
         break
     fi
     echo "other times sleep 10s..."
-    sleep 10
+    sleep 5
 done
 
 echo "into work_package"
 cd /data1/spider/menggui/zhuanli_spider/cnipr/
 echo "excute main program"
-nohup python /data1/spider/menggui/zhuanli_spider/cnipr/cmd_meng.py >> /data1/spider/menggui/zhuanli_spider/cnipr/meng_1.out 2>&1 &
+nohup python /data1/spider/menggui/zhuanli_spider/cnipr/cmd_meng.py >> /data1/spider/menggui/zhuanli_spider/cnipr/out_meng.out 2>&1 &
