@@ -30,5 +30,7 @@ do
     sleep 10
 done
 
+echo "into work_package"
+cd /data1/spider/menggui/zhuanli_spider/cnipr/
 echo "excute main program"
 nohup python /data1/spider/menggui/zhuanli_spider/cnipr/cmd_meng.py >> /data1/spider/menggui/zhuanli_spider/cnipr/meng_1.out 2>&1 &
