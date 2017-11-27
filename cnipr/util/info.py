@@ -1,7 +1,7 @@
 import pymysql
 from rediscluster import StrictRedisCluster
 
-# redis
+############################ redis info ############################
 startup_nodes = [{"host": "172.29.237.209", "port": "7000"},
                  {"host": "172.29.237.209", "port": "7001"},
                  {"host": "172.29.237.209", "port": "7002"},
@@ -13,6 +13,7 @@ startup_nodes = [{"host": "172.29.237.209", "port": "7000"},
                  {"host": "172.29.237.215", "port": "7008"}]
 # rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 
+############################ mysql info ############################
 # etl
 etl_conf = {'host': '172.31.215.44', 'port': 3306, 'user': 'base', 'password': 'imkloKuLiqNMc6Cn', 'charset': 'utf8mb4',
             'cursorclass': pymysql.cursors.DictCursor}
@@ -38,3 +39,9 @@ weisaite_conf = etl_conf.copy()
 weisaite_conf.update({'host': '172.31.215.45'})
 weisaite = pymysql.connect(**weisaite_conf)
 # weisaite.select_db('spider')
+
+############################ user info ############################
+user_dict = {
+	'wlglzx': {'username': 'wlglzx', 'password': '!QAZ2wsx'},
+	'mengguiyouziyi': {'username': 'mengguiyouziyi', 'password': '3646287'}
+}

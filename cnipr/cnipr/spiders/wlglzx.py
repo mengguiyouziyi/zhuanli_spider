@@ -2,11 +2,10 @@
 import scrapy
 import requests
 import json
-from random import choice
 from random import random
 from urllib.parse import urljoin
 from cnipr.items import CniprItem
-from util.info import startup_nodes
+from util.info import startup_nodes, user_dict
 from rediscluster import StrictRedisCluster
 from scrapy.exceptions import CloseSpider
 
@@ -22,11 +21,7 @@ class TouzishijianSpider(scrapy.Spider):
 	def __init__(self):
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
 		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
-		self.user_list = [
-			{'username': 'wlglzx', 'password': '!QAZ2wsx'},
-			# {'username': 'mengguiyouziyi', 'password': '3646287'}
-		]
-		self.user = choice(self.user_list)
+		self.user = user_dict['wlglzx']
 		self.cookie_dict = self.login()
 		print(self.cookie_dict)
 
@@ -50,24 +45,6 @@ class TouzishijianSpider(scrapy.Spider):
 			comp = self.rc.rpop('cnipr_comp')
 			if not comp:
 				raise CloseSpider('no datas')
-			# comps = [
-			# 	'1~10347203625134653463~国家电网公司',
-			# 	'2~15251839184792798233~华为技术有限公司',
-			# 	'3~ad~中兴通讯股份有限公司',
-			# 	'4~sdf~三星电子株式会社',
-			# 	'4~sdf~松下电器产业株式会社',
-			# 	'4~sdf~浙江大学',
-			# 	'4~sdf~中国石油化工股份有限公司',
-			# 	'4~sdf~鸿海精密工业股份有限公司',
-			# 	'4~sdf~清华大学',
-			# 	'4~sdf~东南大学',
-			# 	'4~sdf~上海交通大学',
-			# 	'4~sdf~鸿富锦精密工业(深圳)有限公司',
-			# 	'4~sdf~中国石油大学(华东)',
-			# 	'4~sdf~佳能株式会社',
-			# ]
-			# for comp in comps:
-			# comp = '1~10347203625134653463~国家电网公司'
 			v_l = comp.split('~')
 			origin_id = v_l[0]
 			only_id = v_l[1]
@@ -75,9 +52,7 @@ class TouzishijianSpider(scrapy.Spider):
 			item = CniprItem()
 			gongkai_url = 'http://search.cnipr.com/search!doDetailSearch.action'
 			gongkai = 'strWhere=%(where)s&recordCursor=%(cursor)s&iOption=&iHitPointType=115&strSortMethod=RELEVANCE&strSources=%(sources)s&strSynonymous=&yuyijs=&otherWhere=&gotolight=' % {
-				'where': '申请（专利权）人=(%s)' % comp_full_name.replace('(', r'\(').replace(')', r'\)').replace('（',
-				                                                                                          r'\（').replace(
-					'）', r'\）'),
+				'where': '申请（专利权）人=(%s)' % self._hanBracket(comp_full_name),
 				'sources': self.sources,
 				'cursor': '0',
 			}
@@ -580,43 +555,6 @@ class TouzishijianSpider(scrapy.Spider):
 		item['shoufeeList'] = json.dumps(shoufeeList_dict) if shoufeeList_dict else ''
 		yield item
 
-	# 	paramAn = item['paramAn']
-	# 	paramPd = item['paramPd']
-	# 	paramDB = item['paramDB']
-	# 	quanli_url = 'http://search.cnipr.com/loaddata!loadXml.action?rd=%(rd)s&an=%(an)s&strSource=%(strSource)s&pd=%(pd)s&xmltype=CLM' % {
-	# 		'rd': random(),
-	# 		'an': paramAn,
-	# 		'strSource': paramDB,
-	# 		'pd': paramPd,
-	# 	}
-	# 	yield scrapy.Request(quanli_url, cookies=self.cookie_dict, callback=self.quanli,
-	# 	                     meta={'item': item})
-	#
-	# def quanli(self, response):
-	# 	"""权利要求书"""
-	# 	item = response.meta.get('item')
-	# 	paramAn = item['paramAn']
-	# 	paramPd = item['paramPd']
-	# 	paramDB = item['paramDB']
-	# 	text = json.loads(response.text)
-	# 	xml = text.get('xml')
-	# 	item['claim'] = xml
-	# 	shuoming_url = 'http://search.cnipr.com/loaddata!loadXml.action?rd=%(rd)s&an=%(an)s&strSource=%(strSource)s&pd=%(pd)s&xmltype=DES' % {
-	# 		'rd': random(),
-	# 		'an': paramAn,
-	# 		'strSource': paramDB,
-	# 		'pd': paramPd,
-	# 	}
-	# 	yield scrapy.Request(shuoming_url, cookies=self.cookie_dict, callback=self.shuoming,
-	# 	                     meta={'item': item})
-	#
-	# def shuoming(self, response):
-	# 	"""说明书"""
-	# 	item = response.meta.get('item')
-	# 	text = json.loads(response.text)
-	# 	xml = text.get('xml')
-	# 	item['description'] = xml
-
 	def _solSpace(self, s):
 		return s.strip().replace('\t', '').replace('\r', '').replace('\n', '')
 
@@ -629,3 +567,5 @@ class TouzishijianSpider(scrapy.Spider):
 		vl_2 = vl_1 if '无' != vl_1 else ''
 		return vl_2
 
+	def _hanBracket(self, s):
+		return s.replace('(', r'\(').replace(')', r'\)').replace('（', r'\（').replace('）', r'\）')

@@ -1,5 +1,5 @@
 # coding:utf-8
-
+"""get patent base info and sum from patent_cnipr_all, insert into redis"""
 import os
 import sys
 from os.path import dirname
@@ -11,17 +11,17 @@ sys.path.append(path)
 sys.path.append(base_path)
 sys.path.append(father_path)
 
-from info import startup_nodes, etl
+from util.info import startup_nodes, etl
 from rediscluster import StrictRedisCluster
 
 
 def send_key(key):
 	rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 	cursor = etl.cursor()
-	sql = """select id, only_id, comp_full_name from zhuanli_shenqing_comp"""
+	sql = """select origin_id, only_id, comp_full_name, paramCount from patent_cnipr_all"""
 	cursor.execute(sql)
 	results = cursor.fetchall()
-	values = [str(result['id']) + '~' + str(result['only_id']) + '~' + str(result['comp_full_name']) for result in
+	values = [str(result['origin_id']) + '~' + str(result['only_id']) + '~' + str(result['comp_full_name']) + str(result['paramCount']) for result in
 	          results]
 	if values:
 		for i, value in enumerate(values):
@@ -30,4 +30,4 @@ def send_key(key):
 
 
 if __name__ == '__main__':
-	send_key(key='cnipr_comp')
+	send_key(key='cnipr_comp_sum')
