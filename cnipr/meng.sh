@@ -13,8 +13,8 @@ do
     kill $id
     echo "killed $id"
 done
-echo "first sleep 10s..."
-sleep 25
+echo "first sleep 30s..."
+sleep 30
 
 while true
 do
@@ -24,7 +24,7 @@ do
     then
         break
     fi
-    echo "other times sleep 10s..."
+    echo "other times sleep 5s..."
     sleep 5
 done
 
