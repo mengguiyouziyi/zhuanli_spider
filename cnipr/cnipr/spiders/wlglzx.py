@@ -12,7 +12,7 @@ from scrapy.exceptions import CloseSpider
 
 
 class TouzishijianSpider(scrapy.Spider):
-	name = 'cnipr_use'
+	name = 'wlglzx'
 	custom_settings = {
 		'DEFAULT_REQUEST_HEADERS': {
 			'content-type': "application/x-www-form-urlencoded",
