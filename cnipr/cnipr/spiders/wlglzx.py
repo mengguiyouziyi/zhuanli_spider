@@ -17,7 +17,16 @@ class TouzishijianSpider(scrapy.Spider):
 			'content-type': "application/x-www-form-urlencoded",
 		},
 	}
-
+	proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
+		"host": "http-cla.abuyun.com",
+		"port": "9030",
+		"user": "H5JQ2D5J51RO184C",
+		"pass": "ED5CACF63DA1A566",
+	}
+	proxies = {
+		"http": proxyMeta,
+		"https": proxyMeta,
+	}
 	def __init__(self):
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
 		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
@@ -29,13 +38,13 @@ class TouzishijianSpider(scrapy.Spider):
 		login_url = 'http://search.cnipr.com/login.action?rd={}'.format(random())
 		# payloads = 'username=mengguiyouziyi&password=3646287'
 		print(self.user)
-		response = requests.request("POST", login_url, data=self.user)
+		response = requests.request("POST", login_url, data=self.user, proxies=self.proxies)
 		j_res = response.json()
 		print(response.text)
 		if j_res.get('msg') == 'alreadylogin':
 			print('alreadylogin.....')
 			goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd={}'.format(random())
-			response = requests.request("POST", goonlogin_url, data=self.user)
+			response = requests.request("POST", goonlogin_url, data=self.user, proxies=self.proxies)
 		print(response.text)
 		cookie_dict = dict(response.cookies.items())
 		return cookie_dict
