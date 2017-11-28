@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import requests
-import json
+import json, time
 from random import random
 from urllib.parse import urljoin
 from cnipr.items import CniprItem
@@ -154,6 +154,9 @@ class TouzishijianSpider(scrapy.Spider):
 			yield item
 			return
 		elif '您的操作过于频繁' in response.text:
+			res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict)
+			print(res.text)
+			print(res.content)
 			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
