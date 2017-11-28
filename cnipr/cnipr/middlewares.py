@@ -44,9 +44,9 @@ from scrapy.exceptions import IgnoreRequest, CloseSpider
 
 class ProxyMiddleware(object):
 	def __init__(self):
-		self.proxyServer = "http://proxy.abuyun.com:9020"
+		self.proxyServer = "http://http-cla.abuyun.com:9030"
 		pl = [
-			"HJ3F19379O94DO9D:D1766F5002A70BC4",
+			# "HJ3F19379O94DO9D:D1766F5002A70BC4",
 			# "H285292O32R01G0D:1DA6335539C2EB5F",
 			# "HD3920957396Y39D:9E33CB0DEAD0A6E7",
 			# "HH8W3B5VNSU81V6D:77D96A7DC3F52766",
@@ -57,6 +57,7 @@ class ProxyMiddleware(object):
 			# "H51144995KA6IC8D:E0F0E2F2B96DED0F",
 			# "HMQFU126826U5J7D:176550D703FA05E4",
 			# "H34C100W441WVO6D:A3CD5352C2863367",
+			"H5JQ2D5J51RO184C:ED5CACF63DA1A566",
 		]
 		self.proxyAuths = ["Basic " + base64.urlsafe_b64encode(bytes(p, "ascii")).decode("utf8") for p in pl]
 
