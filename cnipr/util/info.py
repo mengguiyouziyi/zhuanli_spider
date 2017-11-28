@@ -22,22 +22,22 @@ etl.select_db('spider')
 
 online_conf = etl_conf.copy()
 online_conf.update({'host': '172.31.215.33'})
-online = pymysql.connect(**online_conf)
+# online = pymysql.connect(**online_conf)
 # online.select_db('spider')
 
 kaifa_conf = etl_conf.copy()
 kaifa_conf.update({'host': '172.31.215.36'})
 kaifa = pymysql.connect(**kaifa_conf)
-kaifa.select_db('innotree_data_assessment')
+# kaifa.select_db('innotree_data_assessment')
 
 panshi_conf = etl_conf.copy()
 panshi_conf.update({'host': '172.31.215.37'})
-panshi = pymysql.connect(**panshi_conf)
+# panshi = pymysql.connect(**panshi_conf)
 # panshi.select_db('spider')
 
 weisaite_conf = etl_conf.copy()
 weisaite_conf.update({'host': '172.31.215.45'})
-weisaite = pymysql.connect(**weisaite_conf)
+# weisaite = pymysql.connect(**weisaite_conf)
 # weisaite.select_db('spider')
 
 ############################ user info ############################

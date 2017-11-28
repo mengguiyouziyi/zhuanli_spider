@@ -156,6 +156,7 @@ class TouzishijianSpider(scrapy.Spider):
 			res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict)
 			with open('y.jpeg', 'wb') as f:
 				f.write(res.content)
+
 			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
