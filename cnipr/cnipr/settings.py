@@ -117,7 +117,7 @@ USER_AGENT_CHOICES = [
 DOWNLOADER_MIDDLEWARES = {
 	# 'cnipr.middlewares.ProxyMiddleware': 1,
 	# 'cnipr.middlewares.RetryMiddleware': 110,
-	'cnipr.middlewares.RotateUserAgentMiddleware': 3,
+	# 'cnipr.middlewares.RotateUserAgentMiddleware': 3,
 	# 'cnipr.middlewares.BloomfilterMiddleware': 2,
 	# 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
 }
