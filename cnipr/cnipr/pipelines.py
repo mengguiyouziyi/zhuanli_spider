@@ -5,12 +5,10 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import hashlib
 from scrapy.exceptions import CloseSpider
-from scrapy.exceptions import DropItem
 from cnipr.items import CniprItem
 from util.info import etl, startup_nodes
-from rediscluster import StrictRedisCluster
+# from rediscluster import StrictRedisCluster
 
 
 class MysqlPipeline(object):
@@ -71,8 +69,8 @@ class MysqlPipeline(object):
 			self.conn.commit()
 			print(item['title'])
 		except Exception as e:
-			cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
-				item['comp_full_name']) + '~' + str(item['cursorPage'])
+			# cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			# 	item['comp_full_name']) + '~' + str(item['cursorPage'])
 			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print(e)
 			print('mysql error，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
