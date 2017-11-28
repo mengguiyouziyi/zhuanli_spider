@@ -74,14 +74,14 @@ class RetryMiddleware(object):
 			retryreq.dont_filter = True
 			return retryreq
 		else:
-			url = response.url
-			if 'doDetailSearch' in url:
-				paramAn = response.xpath('//input[@id="paramAn"]/@value').extract_first()
-				if not paramAn:
-					print('no paramAn, retry')
-					retryreq = request.copy()
-					retryreq.dont_filter = True
-					return retryreq
+			# url = response.url
+			# if 'doDetailSearch' in url:
+			# 	paramAn = response.xpath('//input[@id="paramAn"]/@value').extract_first()
+			# 	if not paramAn:
+			# 		print('no paramAn, retry')
+			# 		retryreq = request.copy()
+			# 		retryreq.dont_filter = True
+			# 		return retryreq
 			return response
 
 
