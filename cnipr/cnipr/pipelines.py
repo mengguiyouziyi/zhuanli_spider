@@ -16,11 +16,11 @@ from rediscluster import StrictRedisCluster
 class MysqlPipeline(object):
 	def __init__(self, crawler):
 		self.crawler = crawler
-
+		self.tab = 'patent_cnipr_all'
 		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.conn = etl
 		self.cursor = self.conn.cursor()
-		self.col_list = self._get_column('patent_cnipr_all_test')[1:-1]
+		self.col_list = self._get_column(self.tab)[1:-1]
 		self.col_str = ','.join(self.col_list)
 		self.val_str = self._handle_str(len(self.col_list))
 
@@ -62,7 +62,7 @@ class MysqlPipeline(object):
 
 	def process_item(self, item, spider):
 		if isinstance(item, CniprItem):
-			sql = """insert into patent_cnipr_all_test ({col}) VALUES ({val})""".format(col=self.col_str, val=self.val_str)
+			sql = """insert into {tab} ({col}) VALUES ({val})""".format(tab=self.tab, col=self.col_str, val=self.val_str)
 			args = [item[i] for i in self.col_list]
 		else:
 			raise CloseSpider('no item match...')
