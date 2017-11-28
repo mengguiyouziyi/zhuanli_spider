@@ -17,10 +17,10 @@ class MysqlPipeline(object):
 	def __init__(self, crawler):
 		self.crawler = crawler
 
-		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.conn = etl
 		self.cursor = self.conn.cursor()
-		self.col_list = self._get_column('patent_cnipr_all')[1:-1]
+		self.col_list = self._get_column('patent_cnipr_all_test')[1:-1]
 		self.col_str = ','.join(self.col_list)
 		self.val_str = self._handle_str(len(self.col_list))
 
@@ -62,7 +62,7 @@ class MysqlPipeline(object):
 
 	def process_item(self, item, spider):
 		if isinstance(item, CniprItem):
-			sql = """insert into patent_cnipr_all ({col}) VALUES ({val})""".format(col=self.col_str, val=self.val_str)
+			sql = """insert into patent_cnipr_all_test ({col}) VALUES ({val})""".format(col=self.col_str, val=self.val_str)
 			args = [item[i] for i in self.col_list]
 		else:
 			raise CloseSpider('no item match...')
@@ -73,36 +73,9 @@ class MysqlPipeline(object):
 		except Exception as e:
 			cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 				item['comp_full_name']) + '~' + str(item['cursorPage'])
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print(e)
 			print('mysql error，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			self.crawler.engine.close_spider(spider, 'mysql error')
 
 
-class DuplicatesPipeline(object):
-	def __init__(self):
-		self.item_set = set()
-
-	def process_item(self, item, spider):
-		m = self.gen_md5(item['comp_url'])
-		if m in self.item_set:
-			raise DropItem("Duplicate item found")
-		else:
-			self.item_set.add(m)
-			return item
-
-	def gen_md5(self, comp_name):
-		"""
-		生成唯一id
-		:return:
-		0cc2662f5eb157c8ffcd43c145de499f2ab27a71
-		72843135390705548651698998647502012318670289521
-		a3f4a5b080e2a4ef4a708b9c9f5ad003
-		217934444328053067635429399579879723011
-		"""
-		m = hashlib.md5()
-		m.update(comp_name.encode('utf-8'))
-		comp_md5 = m.hexdigest()
-		# only_id_full = int(comp_md5, 16)
-		# return str(only_id_full)
-		return comp_md5

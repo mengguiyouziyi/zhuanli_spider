@@ -11,7 +11,7 @@ from scrapy.exceptions import CloseSpider
 
 
 class TouzishijianSpider(scrapy.Spider):
-	name = 'meng'
+	name = 'meng_test'
 	custom_settings = {
 		'DEFAULT_REQUEST_HEADERS': {
 			'content-type': "application/x-www-form-urlencoded",
@@ -20,41 +20,31 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def __init__(self):
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
-		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.user = user_dict['mengguiyouziyi']
 		self.cookie_dict = self.login()
 		print(self.cookie_dict)
 
 	def login(self):
-		proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
-			"host": "http-dyn.abuyun.com",
-			"port": "9020",
-			"user": "HJ3F19379O94DO9D",
-			"pass": "D1766F5002A70BC4",
-		}
-		proxies = {
-			"http": proxyMeta,
-			"https": proxyMeta,
-		}
 		login_url = 'http://search.cnipr.com/login.action?rd={}'.format(random())
 		# payloads = 'username=mengguiyouziyi&password=3646287'
 		print(self.user)
-		response = requests.request("POST", login_url, data=self.user, proxies=proxies)
+		response = requests.request("POST", login_url, data=self.user)
 		j_res = response.json()
 		print(response.text)
 		if j_res.get('msg') == 'alreadylogin':
 			print('alreadylogin.....')
 			goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd={}'.format(random())
-			response = requests.request("POST", goonlogin_url, data=self.user, proxies=proxies)
+			response = requests.request("POST", goonlogin_url, data=self.user)
 		print(response.text)
 		cookie_dict = dict(response.cookies.items())
 		return cookie_dict
 
 	def start_requests(self):
-		while True:
-			comp = self.rc.rpop('cnipr_comp')
-			if not comp:
-				raise CloseSpider('no datas')
+		# while True:
+		# 	comp = self.rc.rpop('cnipr_comp')
+		# 	if not comp:
+		# 		raise CloseSpider('no datas')
 			# comps = [
 			# 	'1~10347203625134653463~国家电网公司',
 			# 	'2~15251839184792798233~华为技术有限公司',
@@ -72,7 +62,7 @@ class TouzishijianSpider(scrapy.Spider):
 			# 	'4~sdf~佳能株式会社',
 			# ]
 			# for comp in comps:
-			# comp = '1~10347203625134653463~国家电网公司'
+			comp = '1~10347203625134653463~国家电网公司'
 			v_l = comp.split('~')
 			origin_id = v_l[0]
 			only_id = v_l[1]
