@@ -143,8 +143,8 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def parse(self, response):
 		"""公开信息"""
-		with open('x.html', 'w') as f:
-			f.writelines(response.text)
+		# with open('x.html', 'w') as f:
+		# 	f.writelines(response.text)
 		item = response.meta.get('item')
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
