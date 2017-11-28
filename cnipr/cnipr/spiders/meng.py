@@ -153,8 +153,8 @@ class TouzishijianSpider(scrapy.Spider):
 			yield item
 			return
 		elif '您的操作过于频繁' in response.text:
-			res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict)
-			print(res.json())
+			res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict).json()
+			print(res)
 			# with open('y.json', 'w') as f:
 			# 	f.writelines(res.text)
 			# self.rc.lpush('cnipr_fail', cnipr_comp)
