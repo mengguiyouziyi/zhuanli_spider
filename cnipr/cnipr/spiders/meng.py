@@ -143,8 +143,7 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def parse(self, response):
 		"""公开信息"""
-		# with open('x.html', 'w') as f:
-		# 	f.writelines(response.text)
+
 		item = response.meta.get('item')
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
@@ -155,8 +154,8 @@ class TouzishijianSpider(scrapy.Spider):
 			return
 		elif '您的操作过于频繁' in response.text:
 			res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict)
-			print(res.text)
-			print(res.content)
+			with open('y.html', 'w') as f:
+				f.writelines(res.text)
 			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
