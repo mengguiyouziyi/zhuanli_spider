@@ -14,7 +14,7 @@ from util.info import etl, startup_nodes
 class MysqlPipeline(object):
 	def __init__(self, crawler):
 		self.crawler = crawler
-		self.tab = 'patent_cnipr_all'
+		self.tab = 'patent_cnipr_all_test'
 		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.conn = etl
 		self.cursor = self.conn.cursor()
