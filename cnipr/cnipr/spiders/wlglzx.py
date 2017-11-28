@@ -27,6 +27,7 @@ class TouzishijianSpider(scrapy.Spider):
 		"http": proxyMeta,
 		"https": proxyMeta,
 	}
+
 	def __init__(self):
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
 		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
@@ -125,7 +126,8 @@ class TouzishijianSpider(scrapy.Spider):
 	def parse(self, response):
 		"""公开信息"""
 		item = response.meta.get('item')
-		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '对不起，没有您访问的内容' in response.text:
 			print('对不起，没有您访问的内容')
 			self.rc.lpush('cnipr_no_result', cnipr_comp)
@@ -455,7 +457,8 @@ class TouzishijianSpider(scrapy.Spider):
 	def parse_shouquan(self, response):
 		"""授权信息"""
 		item = response.meta.get('item')
-		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
 			self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
@@ -475,7 +478,8 @@ class TouzishijianSpider(scrapy.Spider):
 	def legal(self, response):
 		"""法律状态"""
 		item = response.meta.get('item')
-		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
 			self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
@@ -499,7 +503,8 @@ class TouzishijianSpider(scrapy.Spider):
 	def cnReference(self, response):
 		"""引证文献"""
 		item = response.meta.get('item')
-		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
 			self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
@@ -524,7 +529,8 @@ class TouzishijianSpider(scrapy.Spider):
 	def patentList(self, response):
 		"""同族专利"""
 		item = response.meta.get('item')
-		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
 			self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
@@ -548,7 +554,8 @@ class TouzishijianSpider(scrapy.Spider):
 	def shoufei(self, response):
 		"""收费信息"""
 		item = response.meta.get('item')
-		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(item['comp_full_name']) + '~' + str(item['cursorPage'])
+		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
+			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
 			self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
