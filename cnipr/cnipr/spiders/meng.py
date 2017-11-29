@@ -143,7 +143,6 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def parse(self, response):
 		"""公开信息"""
-
 		item = response.meta.get('item')
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
@@ -153,9 +152,9 @@ class TouzishijianSpider(scrapy.Spider):
 			yield item
 			return
 		elif '您的操作过于频繁' in response.text:
-			res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict)
-			with open('y.jpeg', 'wb') as f:
-				f.write(res.content)
+			# res = requests.get('http://search.cnipr.com/RandomCode?nocache={}'.format(int(time.time()*1000)), cookies=self.cookie_dict)
+			# with open('y.jpeg', 'wb') as f:
+			# 	f.write(res.content)
 
 			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
@@ -165,7 +164,7 @@ class TouzishijianSpider(scrapy.Spider):
 		familyid = select.xpath('//input[@id="familyid"]/@value').extract_first()  # 70054101
 		paramAn = select.xpath('//input[@id="paramAn"]/@value').extract_first()  # CN201310571770.7  申请(专利)号
 		if not paramAn:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('no paramAn，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		paramPn = select.xpath('//input[@id="paramPn"]/@value').extract_first()  # CN104636980A  申请公布号

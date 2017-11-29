@@ -39,13 +39,13 @@ class TouzishijianSpider(scrapy.Spider):
 		login_url = 'http://search.cnipr.com/login.action?rd={}'.format(random())
 		# payloads = 'username=mengguiyouziyi&password=3646287'
 		print(self.user)
-		response = requests.request("POST", login_url, data=self.user, proxies=self.proxies)
+		response = requests.request("POST", login_url, data=self.user)
 		j_res = response.json()
 		print(response.text)
 		if j_res.get('msg') == 'alreadylogin':
 			print('alreadylogin.....')
 			goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd={}'.format(random())
-			response = requests.request("POST", goonlogin_url, data=self.user, proxies=self.proxies)
+			response = requests.request("POST", goonlogin_url, data=self.user)
 		print(response.text)
 		cookie_dict = dict(response.cookies.items())
 		return cookie_dict
@@ -130,11 +130,11 @@ class TouzishijianSpider(scrapy.Spider):
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '对不起，没有您访问的内容' in response.text:
 			print('对不起，没有您访问的内容')
-			self.rc.lpush('cnipr_no_result', cnipr_comp)
+			# self.rc.lpush('cnipr_no_result', cnipr_comp)
 			yield item
 			return
 		elif '您的操作过于频繁' in response.text:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		item = response.meta.get('item')
@@ -142,7 +142,7 @@ class TouzishijianSpider(scrapy.Spider):
 		familyid = select.xpath('//input[@id="familyid"]/@value').extract_first()  # 70054101
 		paramAn = select.xpath('//input[@id="paramAn"]/@value').extract_first()  # CN201310571770.7  申请(专利)号
 		if not paramAn:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('no paramAn，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		paramPn = select.xpath('//input[@id="paramPn"]/@value').extract_first()  # CN104636980A  申请公布号
@@ -460,7 +460,7 @@ class TouzishijianSpider(scrapy.Spider):
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		paramAn = item['paramAn']
@@ -481,13 +481,13 @@ class TouzishijianSpider(scrapy.Spider):
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		try:
 			text = json.loads(response.text)
 		except:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('no legal，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		paramPn = item['paramPn']
@@ -506,13 +506,13 @@ class TouzishijianSpider(scrapy.Spider):
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		try:
 			text = json.loads(response.text)
 		except:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('no cnReference，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		familyid = item['familyid']
@@ -532,13 +532,13 @@ class TouzishijianSpider(scrapy.Spider):
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		try:
 			text = json.loads(response.text)
 		except:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('no patentList，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		paramAn = item['paramAn']
@@ -557,13 +557,13 @@ class TouzishijianSpider(scrapy.Spider):
 		cnipr_comp = str(item['origin_id']) + '~' + str(item['only_id']) + '~' + str(
 			item['comp_full_name']) + '~' + str(item['cursorPage'])
 		if '您的操作过于频繁' in response.text:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('您的操作过于频繁，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		try:
 			text = json.loads(response.text)
 		except:
-			self.rc.lpush('cnipr_fail', cnipr_comp)
+			# self.rc.lpush('cnipr_fail', cnipr_comp)
 			print('no shoufei，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			raise CloseSpider('no datas')
 		shoufeeList = text.get('shoufeeList')
