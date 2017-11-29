@@ -37,15 +37,14 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def login(self):
 		login_url = 'http://search.cnipr.com/login.action?rd={}'.format(random())
-		# payloads = 'username=mengguiyouziyi&password=3646287'
 		print(self.user)
-		response = requests.request("POST", login_url, data=self.user)
-		j_res = response.json()
+		response = requests.request(method="POST", url=login_url, data=self.user)
 		print(response.text)
+		j_res = response.json()
 		if j_res.get('msg') == 'alreadylogin':
 			print('alreadylogin.....')
 			goonlogin_url = 'http://search.cnipr.com/login!goonlogin.action?rd={}'.format(random())
-			response = requests.request("POST", goonlogin_url, data=self.user)
+			response = requests.request(method="POST", url=goonlogin_url, data=self.user)
 		print(response.text)
 		cookie_dict = dict(response.cookies.items())
 		return cookie_dict
