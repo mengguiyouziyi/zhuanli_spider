@@ -15,7 +15,7 @@ startup_nodes = [{"host": "172.29.237.209", "port": "7000"},
 
 ############################ mysql info ############################
 # etl
-etl_conf = {'host': '172.31.215.38', 'port': 3306, 'user': 'base', 'password': 'imkloKuLiqNMc6Cn', 'charset': 'utf8mb4',
+etl_conf = {'host': '172.31.215.38', 'port': 3306, 'user': 'spider', 'password': 'spider', 'charset': 'utf8mb4',
             'cursorclass': pymysql.cursors.DictCursor}
 etl = pymysql.connect(**etl_conf)
 etl.select_db('spider')
@@ -45,4 +45,6 @@ user_dict = {
 	'wlglzx': {'username': 'wlglzx', 'password': '!QAZ2wsx'},
 	'mengguiyouziyi': {'username': 'mengguiyouziyi', 'password': '3646287'},
 	'FVVW001': {'username': 'FVVW001', 'password': 'qwe123'},
+	'WuVv1': {'username': 'WuVv1', 'password': 'a7891314'},
+	'CDDS123': {'username': 'CDDS123', 'password': 'zxc123'},
 }

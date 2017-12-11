@@ -12,7 +12,7 @@ from util.info import etl, startup_nodes
 class MysqlPipeline(object):
 	def __init__(self, crawler):
 		self.crawler = crawler
-		self.spider = self.crawler.spider
+		# self.spider = self.crawler.spider
 		self.tab = 'patent_cnipr_all'
 		# 如果有其他item和表结构，需要打开这个注释，并更改spider名字和表名
 		# if self.spider in ['meng', 'wlglzx']:

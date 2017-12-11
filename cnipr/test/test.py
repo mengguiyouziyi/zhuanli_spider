@@ -1,14 +1,15 @@
-import requests
+import pymysql
 
+etl_conf = {'host': '172.31.215.44',
+            'port': 3306,
+            'user': 'spider',
+            'password': 'spider',
+            'charset': 'utf8mb4',
+            'cursorclass': pymysql.cursors.DictCursor}
+etl = pymysql.connect(**etl_conf)
+etl.select_db('spider')
 
-def login():
-	login_url = 'http://search.cnipr.com/login!goonlogin.action?rd=0.6589196511445976'
-	payloads = 'username=mengguiyouziyi&password=3646287'
-	payload = {'username': 'mengguiyouziyi', 'password': '3646287'}
-	response = requests.request("POST", login_url, data=payload)
-	print(response.cookies.items())
-	print(dict(response.cookies.items()))
-
-
-if __name__ == '__main__':
-	login()
+sql = """insert into patent_cnipr_all_copy (origin_id) VALUES (%s)"""
+cursor = etl.cursor()
+cursor.execute(sql, (1,))
+etl.commit()
