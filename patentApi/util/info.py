@@ -41,8 +41,8 @@ etl.select_db('spider')
 # # weisaite.select_db('spider')
 
 ############################ user info ############################
-user_dict = {
-	'wlglzx': {'username': 'wlglzx', 'password': '!QAZ2wsx'},
-	'mengguiyouziyi': {'username': 'mengguiyouziyi', 'password': '3646287'},
-	'FVVW001': {'username': 'FVVW001', 'password': 'qwe123'},
-}
+key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc',
+            'vu', 'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee',
+            'imgo', 'pdfexist', 'ans', 'pns', 'sfpns', 'inc', 'ine', 'ino', 'agc', 'age', 'ago', 'asc',
+            'ase', 'aso', 'exc', 'exe', 'exo']
+

@@ -41,8 +41,23 @@ etl.select_db('spider')
 # # weisaite.select_db('spider')
 
 ############################ user info ############################
-user_dict = {
-	'wlglzx': {'username': 'wlglzx', 'password': '!QAZ2wsx'},
-	'mengguiyouziyi': {'username': 'mengguiyouziyi', 'password': '3646287'},
-	'FVVW001': {'username': 'FVVW001', 'password': 'qwe123'},
-}
+key_list = ['pid', 'tic', 'tie', 'tio', 'ano', 'ad', 'pd', 'pk', 'pno', 'apo', 'ape', 'apc', 'ipc', 'lc',
+            'vu', 'abso', 'abse', 'absc', 'imgtitle', 'imgname', 'lssc', 'pdt', 'debec', 'debeo', 'debee',
+            'imgo', 'pdfexist', 'ans', 'pns', 'sfpns', 'inc', 'ine', 'ino', 'agc', 'age', 'ago', 'asc',
+            'ase', 'aso', 'exc', 'exe', 'exo']
+############################ sql info ############################
+"""
+create table zhuanli_qian_100 
+select only_id, comp_full_name, totle from 
+(select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all UNION all 
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_0 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_1 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_2 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_3 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_4 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_5 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_6 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_7 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_8 UNION all
+select distinct origin_id, only_id, comp_full_name, totle from zhuanli_info_all_9)b;
+"""

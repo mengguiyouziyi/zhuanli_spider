@@ -1,0 +1,5 @@
+pyenv: phantomjs: command not found
+
+The `phantomjs' command exists in these Python versions:
+  Anaconda3-4.3.0
+

@@ -5,11 +5,11 @@ from scrapy import Selector
 
 
 # def get_token(path='/data1/spider/java_spider/phantomjs-2.1.1-linux-x86_64/bin/phantomjs1'):
-def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 # def get_token(path='/home/spider/.pyenv/versions/3.5.3/bin/phantomjs'):
+def get_token(path='/root/.pyenv/versions/3.5.4/bin/phantomjs'):
 	"""
-	path='/root/.pyenv/versions/3.5.4/bin/phantomjs'
-	获取access_token
+	获取token，不同环境，只需变换webdriver和path即可
+	spider服务器默认即可
 	:return:
 	"""
 	browser = webdriver.PhantomJS(executable_path=path)

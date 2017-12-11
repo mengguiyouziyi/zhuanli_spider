@@ -11,7 +11,7 @@ from scrapy.exceptions import CloseSpider
 
 
 class TouzishijianSpider(scrapy.Spider):
-	name = 'meng'
+	name = 'FVVW001_biaodashi'
 	custom_settings = {
 		'DEFAULT_REQUEST_HEADERS': {
 			'content-type': "application/x-www-form-urlencoded",
@@ -20,16 +20,12 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def __init__(self):
 		self.sources = 'FMZL,SYXX,WGZL,FMSQ,TWZL,HKPATENT,USPATENT,EPPATENT,JPPATENT,WOPATENT,GBPATENT,CHPATENT,DEPATENT,KRPATENT,FRPATENT,RUPATENT,ASPATENT,ATPATENT,GCPATENT,ITPATENT,AUPATENT,APPATENT,CAPATENT,SEPATENT,ESPATENT,OTHERPATENT'
-		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
-		self.user = user_dict['mengguiyouziyi']  # 从info中获取账户密码
+		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+		self.user = user_dict['FVVW001']
 		self.cookie_dict = self.login()
 		print(self.cookie_dict)
 
 	def login(self):
-		"""
-		已经登录的话会跳出alert，点击上面的确认按钮之后会发送第二条post登录请求，然后返回cookie
-		:return:
-		"""
 		login_url = 'http://search.cnipr.com/login.action?rd={}'.format(random())
 		print(self.user)
 		response = requests.request(method="POST", url=login_url, data=self.user)
@@ -44,55 +40,14 @@ class TouzishijianSpider(scrapy.Spider):
 		return cookie_dict
 
 	def start_requests(self):
-		"""
-		第一阶段：
-			先以`1~10347203625134653463~国家电网公司`形式将92万公司（要去重）打入redis，每次获取游标0，也即第一条数据；
-			这其中会有失败的情况，但是redis已经pop出来了这条数据，所以需要在 zhuan_shenqing_quan - patent_cnipr_all 的公司，
-			重新打入redis
-		第二阶段：
-			当patent_cnipr_all中的公司全了之后，可以以`1~10347203625134653463~国家电网公司~1`形式打入redis，其中最后一个数字
-			代表需要发送申请的游标（0已经申请，从1开始遍历 paramCount 字段即可），这样即可用分布式不同账号抓取
-		第三阶段：
-			由于patentStatus字段需要在列表页申请，如果需要，可以用 申请（专利权）人=(%s) 的方式去申请列表，然后更新这个字段
-		第四阶段：
-			如果有需求，如通过申请日获取专利，或用表达式申请，可参考 FVVW001_biaodashi.py，方法基本都是用不同的post body申请gongkai_url
-		备注：
-			1、可以把所有失败的，全部组合字段`1~10347203625134653463~国家电网公司~1`，放入一个redis key中（self.rc.lpush('cnipr_fail', cnipr_comp)）
-			2、以目前2.5秒速度抓取即可，快了会出验证码
-			3、验证码会在第二天消失
-			4、cookie会在8个小时以内失效，8是预估的。所以在5个小时左右的时候就需要用crontab控制重启一次，以达到重新登录的效果。
-				但是不要太频繁的登录，会有验证码；不同账号尽量错开时间登录。
-				如：
-				59      */4       *       *       *       sh /data1/spider/menggui/zhuanli_spider/cnipr/sh_meng.sh>>/data1/spider/menggui/zhuanli_spider/cnipr/out_meng_sh.out
-				50      */4       *       *       *       sh /data1/spider/menggui/zhuanli_spider/cnipr/sh_wlglzx.sh>>/data1/spider/menggui/zhuanli_spider/cnipr/out_wlglzx_sh.out
-			5、一个新账号，对应spider、cmd_账号、sh_账号三个文件
-			6、如果想解决验证码问题，可以尝试other_operate中的test_2，用tensserflow识别
-		"""
-		while True:
-			comp = self.rc.rpop('cnipr_comp')
-			if not comp:
-				raise CloseSpider('no datas')
-			# comps = [
-			# 	'1~10347203625134653463~国家电网公司',
-			# 	'2~15251839184792798233~华为技术有限公司',
-			# ]
-			# for comp in comps:
-			# comp = '1~10347203625134653463~国家电网公司'
-			v_l = comp.split('~')
-			origin_id = v_l[0]
-			only_id = v_l[1]
-			comp_full_name = v_l[2]
+		for i in range(140):
 			item = CniprItem()
 			gongkai_url = 'http://search.cnipr.com/search!doDetailSearch.action'
-			gongkai = 'strWhere=%(where)s&recordCursor=%(cursor)s&iOption=&iHitPointType=115&strSortMethod=RELEVANCE&strSources=%(sources)s&strSynonymous=&yuyijs=&otherWhere=&gotolight=' % {
-				'where': '申请（专利权）人=(%s)' % self._hanBracket(comp_full_name),
-				'sources': self.sources,
-				'cursor': '0',
-			}
-			item['origin_id'] = origin_id
-			item['only_id'] = only_id
-			item['comp_full_name'] = comp_full_name
-			item['cursorPage'] = '0'
+			gongkai = 'strWhere=%E4%B8%BB%E5%88%86%E7%B1%BB%E5%8F%B7%3D%28%EF%BC%88G01S17%2F06+or+G01S17%2F08+or+G01S17%2F10+or+G01S17%2F32+or+G01S17%2F36+or+G01S17%2F42+or+G01S17%2F46+or+G01S17%2F48%EF%BC%89%29+and+%E5%90%8D%E7%A7%B0%2C%E6%91%98%E8%A6%81%2C%E6%9D%83%E5%88%A9%E8%A6%81%E6%B1%82%E4%B9%A6%2B%3D%28%E6%BF%80%E5%85%89%E9%9B%B7%E8%BE%BE+and+%28%E4%BD%8D%E7%BD%AE+or+%E5%9D%90%E6%A0%87+or+%E8%B7%9D%E7%A6%BB+or+%E9%95%BF%E5%BA%A6+or+%E5%AE%BD%E5%BA%A6%29%29&start={start}&recordCursor={cur}&limit=1&option=2&iHitPointType=115&strSortMethod=RELEVANCE&strSources=FMZL%2CSYXX%2CWGZL%2CFMSQ%2CTWZL%2CHKPATENT%2CUSPATENT%2CEPPATENT%2CJPPATENT%2CWOPATENT%2CGBPATENT%2CCHPATENT%2CDEPATENT%2CKRPATENT%2CFRPATENT%2CRUPATENT%2CASPATENT%2CATPATENT%2CGCPATENT%2CITPATENT%2CAUPATENT%2CAPPATENT%2CCAPATENT%2CSEPATENT%2CESPATENT%2COTHERPATENT&strSynonymous=&yuyijs=&filterChannel=&otherWhere='
+			item['origin_id'] = -1
+			item['only_id'] = ''
+			item['comp_full_name'] = ''
+			item['cursorPage'] = -1
 			item['tifvalue'] = ''
 			item['xmlvalue'] = ''
 			item['pdfvalue'] = ''
@@ -143,8 +98,36 @@ class TouzishijianSpider(scrapy.Spider):
 			item['claim'] = ''
 			item['description'] = ''
 			item['shoufeeList'] = ''
-			yield scrapy.Request(gongkai_url, method='POST', body=gongkai, cookies=self.cookie_dict,
-			                     meta={'item': item})
+			if i < 10:
+				start = 1
+			elif 10 <= i < 20:
+				start = 2
+			elif 20 <= i < 30:
+				start = 3
+			elif 30 <= i < 40:
+				start = 4
+			elif 40 <= i < 50:
+				start = 5
+			elif 50 <= i < 60:
+				start = 6
+			elif 60 <= i < 70:
+				start = 7
+			elif 70 <= i < 80:
+				start = 8
+			elif 80 <= i < 90:
+				start = 9
+			elif 90 <= i < 100:
+				start = 10
+			elif 100 <= i < 110:
+				start = 11
+			elif 110 <= i < 120:
+				start = 12
+			elif 120 <= i < 130:
+				start = 13
+			else:
+				start = 14
+			yield scrapy.Request(gongkai_url, method='POST', body=gongkai.format(start=start, cur=i),
+			                     cookies=self.cookie_dict, meta={'item': item})
 
 	def parse(self, response):
 		"""公开信息"""
@@ -208,11 +191,11 @@ class TouzishijianSpider(scrapy.Spider):
 		paramPn_shouq = ''
 		paramPd_shouq = ''
 		shouquan_text = select.xpath('//a[@class="icon1"]/text()').extract_first()
-		# 如果没有授权信息，就直接发送后续的请求
 		if not shouquan_text:
 			if '说明书链接' in response.text:
 				title = select.xpath('//div[@name="patti"]/text()').extract_first()
-				abs = select.xpath('//span[@name="patab"]/text()').extract_first()
+				abs = select.xpath('//span[@name="patab"]//text()').extract()
+				abs = self._solStrip(abs)
 				ta_tag = select.xpath('//div[@class="nc3"]/table')
 				applicatDate = ta_tag.xpath('./tr[2]/td[4]/span/text()').extract_first()
 				mainClassNum = ta_tag.xpath('./tr[4]/td[2]/span/text()').extract_first()
@@ -237,7 +220,8 @@ class TouzishijianSpider(scrapy.Spider):
 				abs_pic = abs_pic if 'images/en_img1.jpg' != abs_pic else ''
 			elif '授权公布（公报）' in response.text:
 				title = select.xpath('//div[@class="tp_left"]/h3/text()').extract_first()
-				abs = select.xpath('//div[@class="txt"]//text()').extract_first()
+				abs = select.xpath('//div[@class="txt"]//text()').extract()
+				abs = self._solStrip(abs)
 				ta_tag = select.xpath('//div[@class="x_table"]/table')
 				applicatDate = ta_tag.xpath('./tr[1]/td[2]/span[2]/text()').extract_first()
 				paramPn_shouq = paramPn
@@ -268,8 +252,10 @@ class TouzishijianSpider(scrapy.Spider):
 				author_pdf_url = select.xpath('//a[@class="pctquanwenlianjie"]/@href').extract_first()
 			else:
 				title = select.xpath('//div[@class="nc_left"]/h3/text()').extract_first()
-				abs = select.xpath('//div[@class="nc_left"]/p[1]/text()').extract_first()
-				zhuquan = select.xpath('//div[@class="nc_left"]/p[2]/text()').extract_first()  # 主权项
+				abs = select.xpath('//div[@class="nc_left"]/p[1]//text()').extract()
+				abs = self._solStrip(abs)
+				zhuquan = select.xpath('//div[@class="nc_left"]/p[2]//text()').extract()  # 主权项
+				zhuquan = self._solStrip(zhuquan)
 				tr_tags = select.xpath('//div[@class="nc_right"]/table/tr')
 				for tr in tr_tags:
 					text = tr.xpath('./td[@class="tit"]/text()').extract()
@@ -372,10 +358,12 @@ class TouzishijianSpider(scrapy.Spider):
 				'strAn': paramAn
 			}
 			yield scrapy.Request(legal_url, cookies=self.cookie_dict, callback=self.legal, meta={'item': item})
-		else:  # 如果有授权的，需要先发送授权的请求，然后在授权请求中发送后续的api
+		else:
 			title = select.xpath('//div[@class="nc_left"]/h3/text()').extract_first()
-			abs = select.xpath('//div[@class="nc_left"]/p[1]/text()').extract_first()
-			zhuquan = select.xpath('//div[@class="nc_left"]/p[2]/text()').extract_first()  # 主权项
+			abs = select.xpath('//div[@class="nc_left"]/p[1]//text()').extract()
+			abs = self._solStrip(abs)
+			zhuquan = select.xpath('//div[@class="nc_left"]/p[2]//text()').extract()  # 主权项
+			zhuquan = self._solStrip(zhuquan)
 			tr_tags = select.xpath('//div[@class="nc_right"]/table/tr')
 			for tr in tr_tags:
 				text = tr.xpath('./td[@class="tit"]/text()').extract()
@@ -599,8 +587,6 @@ class TouzishijianSpider(scrapy.Spider):
 		item['shoufeeList'] = json.dumps(shoufeeList_dict) if shoufeeList_dict else ''
 		yield item
 
-	# 如果需要专利的详情，可以打开这两个请求
-
 	# 	paramAn = item['paramAn']
 	# 	paramPd = item['paramPd']
 	# 	paramDB = item['paramDB']
@@ -638,7 +624,6 @@ class TouzishijianSpider(scrapy.Spider):
 	# 	xml = text.get('xml')
 	# 	item['description'] = xml
 
-	# 这几个函数是工具函数
 	def _hanBracket(self, s):
 		return s.replace('(', r'\(').replace(')', r'\)').replace('（', r'\（').replace('）', r'\）')
 
@@ -653,3 +638,6 @@ class TouzishijianSpider(scrapy.Spider):
 		vl_1 = sep.join([self._solSpace(v) for v in vl if v]) if vl else ''
 		vl_2 = vl_1 if '无' != vl_1 else ''
 		return vl_2
+
+	def _solStrip(self, liebiao):
+		return ''.join([l.strip() for l in liebiao if l]) if liebiao else ''

@@ -5,8 +5,6 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from scrapy.exceptions import CloseSpider
-from cnipr.items import CniprItem
 from util.info import etl, startup_nodes
 # from rediscluster import StrictRedisCluster
 
@@ -14,7 +12,12 @@ from util.info import etl, startup_nodes
 class MysqlPipeline(object):
 	def __init__(self, crawler):
 		self.crawler = crawler
+		self.spider = self.crawler.spider
 		self.tab = 'patent_cnipr_all'
+		# 如果有其他item和表结构，需要打开这个注释，并更改spider名字和表名
+		# if self.spider in ['meng', 'wlglzx']:
+		# 	self.tab = 'patent_cnipr_all'
+
 		# self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 		self.conn = etl
 		self.cursor = self.conn.cursor()
@@ -59,11 +62,8 @@ class MysqlPipeline(object):
 		return x
 
 	def process_item(self, item, spider):
-		if isinstance(item, CniprItem):
-			sql = """insert into {tab} ({col}) VALUES ({val})""".format(tab=self.tab, col=self.col_str, val=self.val_str)
-			args = [item[i] for i in self.col_list]
-		else:
-			raise CloseSpider('no item match...')
+		sql = """insert into {tab} ({col}) VALUES ({val})""".format(tab=self.tab, col=self.col_str, val=self.val_str)
+		args = [item[i] for i in self.col_list]
 		try:
 			self.cursor.execute(sql, args)
 			self.conn.commit()
@@ -75,5 +75,3 @@ class MysqlPipeline(object):
 			print(e)
 			print('mysql error，公司为:{si}，指针为:{zhen}'.format(si=item['comp_full_name'], zhen=item['cursorPage']))
 			self.crawler.engine.close_spider(spider, 'mysql error')
-
-
